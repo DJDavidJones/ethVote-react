@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
 import Web3 from "web3";
 import RegistrationAuthority from "./ethereum/RegistrationAuthority.json";
 import ElectionFactory from "./ethereum/ElectionFactory.json";
@@ -54,7 +54,7 @@ class App extends Component {
 
     render() {
         return (
-            <BrowserRouter>
+            <HashRouter>
                 {this.state.web3 === undefined &&
                 this.state.loading === false ? (
                     <Redirect to="/metamask" />
@@ -64,7 +64,7 @@ class App extends Component {
                     <Route path="/metamask" component={Metamask} />
                     <Route component={Error} />
                 </Switch>
-            </BrowserRouter>
+            </HashRouter>
         );
     }
 }
