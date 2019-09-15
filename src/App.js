@@ -5,7 +5,11 @@ import RegistrationAuthority from "./ethereum/RegistrationAuthority.json";
 import ElectionFactory from "./ethereum/ElectionFactory.json";
 import Home from "./components/Home";
 import Metamask from "./components/Metamask";
+import Help from "./components/Help";
+import About from "./components/About";
 import Error from "./components/Error";
+import Header from "./components/Header";
+import { Container } from "semantic-ui-react";
 
 class App extends Component {
     state = {
@@ -14,14 +18,6 @@ class App extends Component {
 
     async componentDidMount() {
         await this.getWeb3AndContracts();
-
-        // to not throw errors in browsers that don't have metamask installed
-        if (this.state.web3) {
-            console.log(
-                "factory manager",
-                await this.state.electionFactory.methods.factoryManager().call()
-            );
-        }
     }
 
     async getWeb3AndContracts() {
@@ -53,17 +49,45 @@ class App extends Component {
     }
 
     render() {
+        const {
+            loading,
+            web3,
+            registrationAuthority,
+            electionFactory
+        } = this.state;
         return (
             <HashRouter>
-                {this.state.web3 === undefined &&
-                this.state.loading === false ? (
-                    <Redirect to="/metamask" />
-                ) : null}
-                <Switch>
-                    <Route path="/" component={Home} exact />
-                    <Route path="/metamask" component={Metamask} />
-                    <Route component={Error} />
-                </Switch>
+                <Container style={{ margin: "1em" }}>
+                    <Header />
+                    <link
+                        rel="stylesheet"
+                        href="//cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css"
+                    />
+                    {this.state.web3 === undefined &&
+                    this.state.loading === false ? (
+                        <Redirect to="/metamask" />
+                    ) : null}
+                    <Switch>
+                        {/*prettier-ignore*/}
+                        <Route
+                            path="/"
+                            exact
+                            render={props => (
+                                <Home
+                                    {...props}
+                                    loading={loading}
+                                    web3={web3}
+                                    registrationAuthority={registrationAuthority}
+                                    electionFactory={electionFactory}
+                                />
+                            )}
+                        />
+                        <Route path="/metamask" component={Metamask} />
+                        <Route path="/help" component={Help} />
+                        <Route path="/about" component={About} />
+                        <Route component={Error} />
+                    </Switch>
+                </Container>
             </HashRouter>
         );
     }

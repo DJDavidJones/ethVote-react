@@ -5,7 +5,7 @@ class Metamask extends Component {
     render() {
         return (
             <div>
-                <p>Install Metamask</p>
+                <h1>Install Metamask</h1>
             </div>
         );
     }
