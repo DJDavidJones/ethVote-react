@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import { Menu, Card, Dimmer, Loader, Image, Segment } from "semantic-ui-react";
+import Election from "../ethereum/Election.json";
 
 class Home extends Component {
     state = {
@@ -8,18 +9,36 @@ class Home extends Component {
         loadedElectionList: false
     };
 
-    async componentDidUpdate() {
-        if (this.props.web3 && this.props.loading === false) {
-            if (!this.state.loadedElectionList) {
-                const elections = await this.props.electionFactory.methods
-                    .getDeployedElections()
-                    .call();
-                this.setState({ elections });
-                this.state.loadedElectionList = true;
-            }
+    componentDidMount() {
+        console.log(this.props);
+    }
 
-            // Display list of elections (past, current, upcoming)
+    async componentDidUpdate() {
+        if (
+            !this.state.loadedElectionList &&
+            this.props.web3 &&
+            this.props.loading === false
+        ) {
+            const electionAddresses = await this.props.electionFactory.methods
+                .getDeployedElections()
+                .call();
+
+            let elections = [];
+            electionAddresses.forEach(async e => {
+                const contract = await this.getElectionContract(e);
+                const contractDetails = {
+                    title: contract.methods.title().call(),
+                    description: contract.methods.description().call(),
+                    startTime: contract.methods.startTime().call(),
+                    timeLimit: contract.methods.timeLimit().call()
+                };
+                elections.push(contractDetails);
+            });
+            this.setState({ elections, loadedElectionList: true });
         }
+
+        // Display list of elections (past, current, upcoming)
+        console.log(this.state);
     }
 
     handleItemClick = (e, { name }) => this.setState({ activeItem: name });
@@ -31,10 +50,11 @@ class Home extends Component {
             this.props.web3 &&
             this.props.loading === false
         ) {
-            items = this.state.elections.map(address => {
+            items = this.state.elections.map(election => {
+                console.log(election);
                 return {
-                    header: "Election",
-                    meta: address,
+                    header: election.title,
+                    description: election.description,
                     fluid: true
                 };
             });
@@ -88,6 +108,17 @@ class Home extends Component {
                 {this.renderElections()}
             </React.Fragment>
         );
+    }
+
+    async getElectionContract(address) {
+        try {
+            const { web3 } = this.props;
+            const abi = JSON.parse(Election.interface);
+            const contract = new web3.eth.Contract(abi, address);
+            return contract;
+        } catch (err) {
+            console.log(err.message);
+        }
     }
 }
 
