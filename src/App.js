@@ -9,7 +9,7 @@ import Help from "./components/Help";
 import About from "./components/About";
 import Error from "./components/Error";
 import Header from "./components/Header";
-import { Container, Dimmer, Loader, Image, Segment } from "semantic-ui-react";
+import { Container } from "semantic-ui-react";
 
 class App extends Component {
     state = {
@@ -89,15 +89,6 @@ class App extends Component {
                         <Route path="/about" component={About} />
                         <Route component={Error} />
                     </Switch>
-
-                    {this.state.loading ? (
-                        <Segment>
-                            <Dimmer active inverted>
-                                <Loader>Loading</Loader>
-                            </Dimmer>
-                            <Image src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
-                        </Segment>
-                    ) : null}
                 </Container>
             </HashRouter>
         );

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Menu, Card } from "semantic-ui-react";
+import { Menu, Card, Dimmer, Loader, Image, Segment } from "semantic-ui-react";
 
 class Home extends Component {
     state = {
@@ -75,6 +75,15 @@ class Home extends Component {
                         onClick={this.handleItemClick}
                     />
                 </Menu>
+
+                {this.props.loading ? (
+                    <Segment>
+                        <Dimmer active inverted>
+                            <Loader>Loading</Loader>
+                        </Dimmer>
+                        <Image src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
+                    </Segment>
+                ) : null}
 
                 {this.renderElections()}
             </React.Fragment>
