@@ -5,6 +5,7 @@ import Web3 from "web3";
 import RegistrationAuthority from "../ethereum/RegistrationAuthority.json";
 import ElectionFactory from "../ethereum/ElectionFactory.json";
 import Election from "../ethereum/Election.json";
+import ElectionMenu from "./electionComponents/ElectionMenu";
 
 class Elections extends Component {
     state = {
@@ -18,18 +19,20 @@ class Elections extends Component {
     }
 
     render() {
-        const { loading, metamask } = this.state;
         return (
             <React.Fragment>
-                {this.renderMenu()}
-                {loading ? (
+                <ElectionMenu
+                    activeItem={this.state.activeItem}
+                    onItemClick={this.handleItemClick}
+                />
+                {this.state.loading ? (
                     <Segment>
                         <Dimmer active inverted>
                             <Loader>Loading</Loader>
                         </Dimmer>
                         <Image src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
                     </Segment>
-                ) : metamask ? (
+                ) : this.state.metamask ? (
                     this.renderList()
                 ) : (
                     <Redirect to="/metamask" />
@@ -38,44 +41,19 @@ class Elections extends Component {
         );
     }
 
-    renderMenu() {
-        const { activeItem } = this.state;
-        return (
-            <Menu pointing secondary compact widths={"3"}>
-                <Menu.Item
-                    name="past"
-                    active={activeItem === "past"}
-                    onClick={this.handleItemClick}
-                />
-                <Menu.Item
-                    name="current"
-                    active={activeItem === "current"}
-                    onClick={this.handleItemClick}
-                />
-                <Menu.Item
-                    name="upcoming"
-                    active={activeItem === "upcoming"}
-                    onClick={this.handleItemClick}
-                />
-            </Menu>
-        );
-    }
-
     handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
     renderList() {
-        const { elections, activeItem } = this.state;
-
         let items;
         const currentTime = Math.floor(Date.now() / 1000);
-        if (activeItem === "past") {
-            items = elections.filter(e => e.timeLimit < currentTime);
-        } else if (activeItem === "current") {
-            items = elections.filter(
+        if (this.state.activeItem === "past") {
+            items = this.state.elections.filter(e => e.timeLimit < currentTime);
+        } else if (this.state.activeItem === "current") {
+            items = this.state.elections.filter(
                 e => e.startTime < currentTime && e.timeLimit > currentTime
             );
-        } else if (activeItem === "upcoming") {
-            items = elections.filter(e => e.startTime > currentTime);
+        } else if (this.state.activeItem === "upcoming") {
+            items = this.state.elections.filter(e => e.startTime > currentTime);
         }
 
         const options = {
@@ -85,6 +63,7 @@ class Elections extends Component {
             hour: "2-digit",
             minute: "2-digit"
         };
+
         items = items.map(election => {
             return {
                 header: election.title,
@@ -125,8 +104,7 @@ class Elections extends Component {
     }
 
     async retrieveDeployedElections() {
-        const { electionFactory } = this.state;
-        const addresses = await electionFactory.methods
+        const addresses = await this.state.electionFactory.methods
             .getDeployedElections()
             .call();
         let elections = [];
@@ -144,26 +122,23 @@ class Elections extends Component {
     }
 
     getRegistrationAuthority() {
-        const { web3 } = this.state;
         const address = "0x74F3F1d24c4bE46e1ef261f48EA87768831cA2C2";
         const abi = JSON.parse(RegistrationAuthority.interface);
-        const contract = new web3.eth.Contract(abi, address);
+        const contract = new this.state.web3.eth.Contract(abi, address);
         this.setState({ registrationAuthority: contract });
     }
 
     getElectionFactory() {
-        const { web3 } = this.state;
         const address = "0xdCaCCc422B7A2d580Ccaa95909b6A9B2E5b0fc05";
         const abi = JSON.parse(ElectionFactory.interface);
-        const contract = new web3.eth.Contract(abi, address);
+        const contract = new this.state.web3.eth.Contract(abi, address);
         this.setState({ electionFactory: contract });
     }
 
     getElectionContract(address) {
         try {
-            const { web3 } = this.state;
             const abi = JSON.parse(Election.interface);
-            const contract = new web3.eth.Contract(abi, address);
+            const contract = new this.state.web3.eth.Contract(abi, address);
             return contract;
         } catch (err) {
             console.log(err.message);
