@@ -9,7 +9,7 @@ import Help from "./components/Help";
 import About from "./components/About";
 import Error from "./components/Error";
 import Header from "./components/Header";
-import { Container } from "semantic-ui-react";
+import { Container, Dimmer, Loader, Image, Segment } from "semantic-ui-react";
 
 class App extends Component {
     state = {
@@ -63,10 +63,12 @@ class App extends Component {
                         rel="stylesheet"
                         href="//cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css"
                     />
+
                     {this.state.web3 === undefined &&
                     this.state.loading === false ? (
                         <Redirect to="/metamask" />
                     ) : null}
+
                     <Switch>
                         {/*prettier-ignore*/}
                         <Route
@@ -87,6 +89,15 @@ class App extends Component {
                         <Route path="/about" component={About} />
                         <Route component={Error} />
                     </Switch>
+
+                    {this.state.loading ? (
+                        <Segment>
+                            <Dimmer active inverted>
+                                <Loader>Loading</Loader>
+                            </Dimmer>
+                            <Image src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
+                        </Segment>
+                    ) : null}
                 </Container>
             </HashRouter>
         );

@@ -1,22 +1,52 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Menu } from "semantic-ui-react";
+import { Menu, Card } from "semantic-ui-react";
 
 class Home extends Component {
     state = {
-        activeItem: "current"
+        activeItem: "current",
+        loadedElectionList: false
     };
 
     async componentDidUpdate() {
         if (this.props.web3 && this.props.loading === false) {
-            console.log(
-                "factory manager",
-                await this.props.electionFactory.methods.factoryManager().call()
-            );
+            if (!this.state.loadedElectionList) {
+                const elections = await this.props.electionFactory.methods
+                    .getDeployedElections()
+                    .call();
+                this.setState({ elections });
+                this.state.loadedElectionList = true;
+            }
+
+            // Display list of elections (past, current, upcoming)
         }
     }
 
     handleItemClick = (e, { name }) => this.setState({ activeItem: name });
+
+    renderElections() {
+        let items;
+        if (
+            this.state.elections &&
+            this.props.web3 &&
+            this.props.loading === false
+        ) {
+            items = this.state.elections.map(address => {
+                return {
+                    header: "Election",
+                    meta: address,
+                    fluid: true
+                };
+            });
+        }
+
+        return (
+            <Card.Group
+                items={items}
+                style={{ marginTop: "0.5em", overflow: "hidden" }}
+            />
+        );
+    }
 
     render() {
         const { activeItem } = this.state;
@@ -27,6 +57,7 @@ class Home extends Component {
                 this.props.loading === false ? (
                     <Redirect to="/metamask" />
                 ) : null}
+
                 <Menu pointing secondary compact widths={"3"}>
                     <Menu.Item
                         name="past"
@@ -44,6 +75,8 @@ class Home extends Component {
                         onClick={this.handleItemClick}
                     />
                 </Menu>
+
+                {this.renderElections()}
             </React.Fragment>
         );
     }
