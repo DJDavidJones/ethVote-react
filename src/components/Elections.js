@@ -21,6 +21,7 @@ class Elections extends Component {
         const { loading, metamask } = this.state;
         return (
             <React.Fragment>
+                {this.renderMenu()}
                 {loading ? (
                     <Segment>
                         <Dimmer active inverted>
@@ -29,10 +30,7 @@ class Elections extends Component {
                         <Image src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
                     </Segment>
                 ) : metamask ? (
-                    <React.Fragment>
-                        {this.renderMenu()}
-                        {this.renderList()}
-                    </React.Fragment>
+                    this.renderList()
                 ) : (
                     <Redirect to="/metamask" />
                 )}
@@ -66,11 +64,41 @@ class Elections extends Component {
     handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
     renderList() {
-        const { elections } = this.state;
-        const items = elections.map(election => {
+        const { elections, activeItem } = this.state;
+
+        let items;
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (activeItem === "past") {
+            items = elections.filter(e => e.timeLimit < currentTime);
+        } else if (activeItem === "current") {
+            items = elections.filter(
+                e => e.startTime < currentTime && e.timeLimit > currentTime
+            );
+        } else if (activeItem === "upcoming") {
+            items = elections.filter(e => e.startTime > currentTime);
+        }
+
+        const options = {
+            day: "2-digit",
+            year: "numeric",
+            month: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit"
+        };
+        items = items.map(election => {
             return {
                 header: election.title,
-                description: election.description,
+                meta: election.description,
+                description:
+                    new Date(election.startTime * 1000).toLocaleDateString(
+                        "da",
+                        options
+                    ) +
+                    " until " +
+                    new Date(election.timeLimit * 1000).toLocaleDateString(
+                        "en-gb",
+                        options
+                    ),
                 fluid: true
             };
         });
@@ -87,8 +115,8 @@ class Elections extends Component {
         try {
             await window.web3.currentProvider.enable();
             this.setState({ web3: new Web3(window.web3.currentProvider) });
-            await this.getRegistrationAuthority();
-            await this.getElectionFactory();
+            this.getRegistrationAuthority();
+            this.getElectionFactory();
             await this.retrieveDeployedElections();
             this.setState({ loading: false, metamask: true });
         } catch (err) {
@@ -103,7 +131,7 @@ class Elections extends Component {
             .call();
         let elections = [];
         addresses.forEach(async e => {
-            const contract = await this.getElectionContract(e);
+            const contract = this.getElectionContract(e);
             const contractDetails = {
                 title: await contract.methods.title().call(),
                 description: await contract.methods.description().call(),
@@ -115,7 +143,7 @@ class Elections extends Component {
         this.setState({ elections });
     }
 
-    async getRegistrationAuthority() {
+    getRegistrationAuthority() {
         const { web3 } = this.state;
         const address = "0x74F3F1d24c4bE46e1ef261f48EA87768831cA2C2";
         const abi = JSON.parse(RegistrationAuthority.interface);
@@ -123,7 +151,7 @@ class Elections extends Component {
         this.setState({ registrationAuthority: contract });
     }
 
-    async getElectionFactory() {
+    getElectionFactory() {
         const { web3 } = this.state;
         const address = "0xdCaCCc422B7A2d580Ccaa95909b6A9B2E5b0fc05";
         const abi = JSON.parse(ElectionFactory.interface);
@@ -131,7 +159,7 @@ class Elections extends Component {
         this.setState({ electionFactory: contract });
     }
 
-    async getElectionContract(address) {
+    getElectionContract(address) {
         try {
             const { web3 } = this.state;
             const abi = JSON.parse(Election.interface);
