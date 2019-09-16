@@ -3,26 +3,48 @@ import { Button, Icon } from "semantic-ui-react";
 
 class ElectionButton extends Component {
     render() {
-        return this.props.activeItem !== "upcoming" ? (
-            <Button floated="right" color="green" animated="fade">
+        return (
+            <Button
+                floated="right"
+                color={
+                    this.props.activeItem === "past"
+                        ? "blue"
+                        : this.props.activeItem === "current"
+                        ? this.props.userIsRegisteredVoter
+                            ? this.props.userHasVoted
+                                ? "olive"
+                                : "green"
+                            : "blue"
+                        : "blue"
+                }
+                animated="fade"
+            >
                 <Button.Content visible>
                     {this.props.activeItem === "past"
                         ? "View Results"
                         : this.props.activeItem === "current"
-                        ? this.props.userHasVoted
-                            ? "Change Vote"
-                            : "Vote"
-                        : null}
+                        ? this.props.userIsRegisteredVoter
+                            ? this.props.userHasVoted
+                                ? "Change Vote"
+                                : "Vote"
+                            : "View"
+                        : "View Options"}
                 </Button.Content>
                 <Button.Content hidden>
                     {this.props.activeItem === "past" ? (
                         <Icon name="envelope open" />
+                    ) : this.props.activeItem === "current" ? (
+                        this.props.userIsRegisteredVoter ? (
+                            <Icon name="pencil" />
+                        ) : (
+                            <Icon name="eye" />
+                        )
                     ) : (
-                        <Icon name="pencil" />
+                        <Icon name="users" />
                     )}
                 </Button.Content>
             </Button>
-        ) : null;
+        );
     }
 }
 

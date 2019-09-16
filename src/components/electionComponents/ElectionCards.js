@@ -33,6 +33,9 @@ class ElectionCards extends Component {
                             startTime={election.startTime}
                             timeLimit={election.timeLimit}
                             userHasVoted={election.userHasVoted}
+                            userIsRegisteredVoter={
+                                this.props.userIsRegisteredVoter
+                            }
                         />
                     ))}
             </Card.Group>

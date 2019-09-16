@@ -10,6 +10,7 @@ class ElectionCard extends Component {
                     <ElectionButton
                         activeItem={this.props.activeItem}
                         userHasVoted={this.props.userHasVoted}
+                        userIsRegisteredVoter={this.props.userIsRegisteredVoter}
                     />
                     <Card.Header>{this.props.title}</Card.Header>
                     <Card.Meta>{this.props.description}</Card.Meta>

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Menu, Icon } from "semantic-ui-react";
+import { Menu, Icon, Dropdown } from "semantic-ui-react";
 
 class Header extends Component {
     render() {
@@ -10,9 +10,16 @@ class Header extends Component {
                     ethVote
                 </Menu.Item>
                 <Menu.Menu position="right">
-                    <Menu.Item as={Link} to="/help" position="right">
-                        Help
-                    </Menu.Item>
+                    <Dropdown item text="Help">
+                        <Dropdown.Menu>
+                            <Dropdown.Item as={Link} to="/metamask">
+                                Metamask
+                            </Dropdown.Item>
+                            <Dropdown.Item as={Link} to="/register">
+                                Register to vote
+                            </Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
                     <Menu.Item as={Link} to="/about" position="right">
                         About
                     </Menu.Item>

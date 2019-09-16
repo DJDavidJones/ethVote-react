@@ -1,17 +1,19 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Card, Dimmer, Loader, Image, Segment } from "semantic-ui-react";
+import { Dimmer, Loader, Image, Segment } from "semantic-ui-react";
 import Web3 from "web3";
 import RegistrationAuthority from "../ethereum/RegistrationAuthority.json";
 import ElectionFactory from "../ethereum/ElectionFactory.json";
 import Election from "../ethereum/Election.json";
 import ElectionMenu from "./electionComponents/ElectionMenu";
 import ElectionCards from "./electionComponents/ElectionCards";
+import NotRegisteredWarning from "./electionComponents/NotRegisteredWarning";
 
 class Elections extends Component {
     state = {
         redirect: false,
         showLoader: true,
+        userIsRegisteredVoter: false,
         activeItem: "current",
         elections: []
     };
@@ -59,12 +61,18 @@ class Elections extends Component {
                 })
             );
 
+            // Check if user is a regsitered voter
+            const registered = await regAuthority.methods
+                .voters(userAddresses[0])
+                .call();
+
             this.setState(function(prevState, props) {
                 return {
                     showLoader: false,
                     web3,
                     regAuthority,
-                    electionFactory
+                    electionFactory,
+                    userIsRegisteredVoter: registered
                 };
             });
         } catch (err) {
@@ -99,6 +107,11 @@ class Elections extends Component {
     render() {
         return (
             <React.Fragment>
+                {this.state.userIsRegisteredVoter === false &&
+                this.state.showLoader === false ? (
+                    <NotRegisteredWarning />
+                ) : null}
+
                 <ElectionMenu
                     activeItem={this.state.activeItem}
                     onItemClick={this.handleItemClick}
@@ -118,55 +131,9 @@ class Elections extends Component {
                 <ElectionCards
                     elections={this.state.elections}
                     activeItem={this.state.activeItem}
+                    userIsRegisteredVoter={this.state.userIsRegisteredVoter}
                 />
             </React.Fragment>
-        );
-    }
-
-    renderList() {
-        let items;
-        const currentTime = Math.floor(Date.now() / 1000);
-        if (this.state.activeItem === "past") {
-            items = this.state.elections.filter(e => e.timeLimit < currentTime);
-        } else if (this.state.activeItem === "current") {
-            items = this.state.elections.filter(
-                e => e.startTime < currentTime && e.timeLimit > currentTime
-            );
-        } else if (this.state.activeItem === "upcoming") {
-            items = this.state.elections.filter(e => e.startTime > currentTime);
-        }
-
-        const options = {
-            day: "2-digit",
-            year: "numeric",
-            month: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit"
-        };
-
-        items = items.map(election => {
-            return {
-                header: election.title,
-                meta: election.description,
-                description:
-                    new Date(election.startTime * 1000).toLocaleDateString(
-                        "da",
-                        options
-                    ) +
-                    " until " +
-                    new Date(election.timeLimit * 1000).toLocaleDateString(
-                        "en-gb",
-                        options
-                    ),
-                fluid: true
-            };
-        });
-
-        return (
-            <Card.Group
-                items={items}
-                style={{ marginTop: "0.5em", overflow: "hidden" }}
-            />
         );
     }
 }
