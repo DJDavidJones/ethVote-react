@@ -14,6 +14,7 @@ class Elections extends Component {
         redirect: false,
         showLoader: true,
         userIsRegisteredVoter: false,
+        wrongNetwork: false,
         activeItem: "current",
         elections: []
     };
@@ -30,6 +31,17 @@ class Elections extends Component {
             web3 = new Web3(window.web3.currentProvider);
             regAuthority = this.getRegistrationAuthority(web3);
             electionFactory = this.getElectionFactory(web3);
+
+            window.web3.currentProvider.on(
+                "accountsChanged",
+                this.metamaskChanged
+            );
+
+            window.web3.currentProvider.autoRefreshOnNetworkChange = false;
+            window.web3.currentProvider.on(
+                "networkChanged",
+                this.metamaskChanged
+            );
 
             // Get Elections
             const addresses = await electionFactory.methods
@@ -77,9 +89,17 @@ class Elections extends Component {
                 };
             });
         } catch (err) {
-            this.setState(function(prevState, props) {
-                return { redirect: true };
-            });
+            if (window.web3 === undefined) {
+                // Metamask not installed
+                this.setState(function(prevState, props) {
+                    return { redirect: true };
+                });
+            } else {
+                // Wrong Ethereum network
+                this.setState(function(prevState, props) {
+                    return { wrongNetwork: true };
+                });
+            }
         }
     }
 
@@ -105,6 +125,10 @@ class Elections extends Component {
 
     handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
+    metamaskChanged = () => {
+        window.location.reload();
+    };
+
     render() {
         return (
             <React.Fragment>
@@ -119,6 +143,10 @@ class Elections extends Component {
                 />
 
                 {this.state.redirect ? <Redirect to="/metamask" /> : null}
+
+                {this.state.wrongNetwork ? (
+                    <Redirect to="/wrongnetwork" />
+                ) : null}
 
                 {this.state.showLoader ? (
                     <Segment>

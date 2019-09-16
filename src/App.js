@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { HashRouter, Route, Switch } from "react-router-dom";
 import Elections from "./components/Elections";
 import Metamask from "./components/Metamask";
+import MetamaskWrongNetwork from "./components/MetamaskWrongNetwork";
 import Register from "./components/Register";
 import About from "./components/About";
 import Error from "./components/Error";
@@ -23,6 +24,10 @@ class App extends Component {
                     <Switch>
                         <Route path="/" exact component={Elections} />
                         <Route path="/metamask" component={Metamask} />
+                        <Route
+                            path="/wrongnetwork"
+                            component={MetamaskWrongNetwork}
+                        />
                         <Route path="/register" component={Register} />
                         <Route path="/about" component={About} />
                         <Route
