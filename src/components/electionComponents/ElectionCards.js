@@ -32,6 +32,7 @@ class ElectionCards extends Component {
                             description={election.description}
                             startTime={election.startTime}
                             timeLimit={election.timeLimit}
+                            userHasVoted={election.userHasVoted}
                         />
                     ))}
             </Card.Group>

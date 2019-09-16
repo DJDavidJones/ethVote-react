@@ -1,11 +1,16 @@
 import React, { Component } from "react";
 import { Card, Icon } from "semantic-ui-react";
+import ElectionButton from "./ElectionButton";
 
 class ElectionCard extends Component {
     render() {
         return (
             <Card fluid>
                 <Card.Content>
+                    <ElectionButton
+                        activeItem={this.props.activeItem}
+                        userHasVoted={this.props.userHasVoted}
+                    />
                     <Card.Header>{this.props.title}</Card.Header>
                     <Card.Meta>{this.props.description}</Card.Meta>
                 </Card.Content>

@@ -34,6 +34,8 @@ class Elections extends Component {
                 .getDeployedElections()
                 .call();
 
+            const userAddresses = await web3.eth.getAccounts();
+
             // forEach doesn't await all instructions
             // See: https://stackoverflow.com/questions/37576685/using-async-await-with-a-foreach-loop
             await Promise.all(
@@ -45,7 +47,10 @@ class Elections extends Component {
                             .description()
                             .call(),
                         startTime: await contract.methods.startTime().call(),
-                        timeLimit: await contract.methods.timeLimit().call()
+                        timeLimit: await contract.methods.timeLimit().call(),
+                        userHasVoted: await contract.methods
+                            .hasVoted(userAddresses[0])
+                            .call()
                     };
 
                     this.setState({
