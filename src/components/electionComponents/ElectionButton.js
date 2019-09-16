@@ -1,10 +1,13 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import { Button, Icon } from "semantic-ui-react";
 
 class ElectionButton extends Component {
     render() {
         return (
             <Button
+                as={Link}
+                to={`election/${this.props.contractAddress}`}
                 floated="right"
                 color={
                     this.props.activeItem === "past"

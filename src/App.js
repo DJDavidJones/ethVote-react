@@ -7,6 +7,7 @@ import About from "./components/About";
 import Error from "./components/Error";
 import Header from "./components/Header";
 import { Container } from "semantic-ui-react";
+import ViewElection from "./components/ViewElection";
 
 class App extends Component {
     render() {
@@ -24,6 +25,10 @@ class App extends Component {
                         <Route path="/metamask" component={Metamask} />
                         <Route path="/register" component={Register} />
                         <Route path="/about" component={About} />
+                        <Route
+                            path="/election/:address"
+                            component={ViewElection}
+                        />
                         <Route component={Error} />
                     </Switch>
                 </Container>

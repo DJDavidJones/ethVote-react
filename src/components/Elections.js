@@ -44,6 +44,7 @@ class Elections extends Component {
                 addresses.map(async e => {
                     const contract = this.getElectionContract(web3, e);
                     const contractDetails = {
+                        address: await contract._address,
                         title: await contract.methods.title().call(),
                         description: await contract.methods
                             .description()

@@ -11,6 +11,7 @@ class ElectionCard extends Component {
                         activeItem={this.props.activeItem}
                         userHasVoted={this.props.userHasVoted}
                         userIsRegisteredVoter={this.props.userIsRegisteredVoter}
+                        contractAddress={this.props.address}
                     />
                     <Card.Header>{this.props.title}</Card.Header>
                     <Card.Meta>{this.props.description}</Card.Meta>
