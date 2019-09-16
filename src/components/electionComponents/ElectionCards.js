@@ -24,6 +24,18 @@ class ElectionCards extends Component {
                                 return false;
                         }
                     })
+                    .sort(function(a, b) {
+                        if (activeItem === "past") {
+                            // recently ended first
+                            return a.timeLimit - b.timeLimit ? -1 : 1; // -1 : 1 reverses the order
+                        } else if (activeItem === "current") {
+                            // ending soon first
+                            return a.timeLimit - b.timeLimit;
+                        } else {
+                            // starting soon first
+                            return a.startTime - b.startTime;
+                        }
+                    })
                     .map((election, i) => (
                         <ElectionCard
                             key={i}
