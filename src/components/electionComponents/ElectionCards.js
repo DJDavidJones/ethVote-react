@@ -27,6 +27,7 @@ class ElectionCards extends Component {
                     .map((election, i) => (
                         <ElectionCard
                             key={i}
+                            activeItem={activeItem}
                             title={election.title}
                             description={election.description}
                             startTime={election.startTime}
