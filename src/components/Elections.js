@@ -104,14 +104,14 @@ class Elections extends Component {
     }
 
     getRegistrationAuthority(web3) {
-        const address = "0x74F3F1d24c4bE46e1ef261f48EA87768831cA2C2";
+        const address = "0x7CA8bDF1721b332fE1F40260c782f605b37B8BbF";
         const abi = JSON.parse(RegistrationAuthority.interface);
         const contract = new web3.eth.Contract(abi, address);
         return contract;
     }
 
     getElectionFactory(web3) {
-        const address = "0xdCaCCc422B7A2d580Ccaa95909b6A9B2E5b0fc05";
+        const address = "0x1115b7f57b899651D270470031AC6D6cDEc62364";
         const abi = JSON.parse(ElectionFactory.interface);
         const contract = new web3.eth.Contract(abi, address);
         return contract;
