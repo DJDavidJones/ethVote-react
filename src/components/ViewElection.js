@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Header, Segment } from "semantic-ui-react";
+import { Header, Segment, Message } from "semantic-ui-react";
 import OptionsTableActiveElection from "./electionPageComponents/OptionsTableActiveElection";
 import NotRegisteredWarning from "./NotRegisteredWarning";
 import Web3 from "web3";
@@ -73,7 +73,8 @@ class ViewElection extends Component {
             this.setState({
                 contract,
                 contractDetails,
-                userIsRegisteredVoter: registered
+                userIsRegisteredVoter: registered,
+                userAddresses
             });
         } catch (err) {
             if (window.web3 === undefined) {
@@ -181,6 +182,13 @@ class ViewElection extends Component {
                     </Header>
                 </Segment>
 
+                {this.state.contractDetails.userHasVoted ? (
+                    <Message info>
+                        You have already voted. You can simply vote again, which
+                        will override your previous vote.
+                    </Message>
+                ) : null}
+
                 {contractStatus !== "error" ? (
                     contractStatus === "past" ? (
                         "past"
@@ -191,9 +199,11 @@ class ViewElection extends Component {
                             ) : null}
                             <OptionsTableActiveElection
                                 options={this.state.contractDetails.options}
+                                contract={this.state.contract}
                                 userIsRegisteredVoter={
                                     this.state.userIsRegisteredVoter
                                 }
+                                userAddresses={this.state.userAddresses}
                             />
                         </React.Fragment>
                     ) : (

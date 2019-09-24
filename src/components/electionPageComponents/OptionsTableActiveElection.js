@@ -13,7 +13,8 @@ import {
 class OptionsTableActiveElection extends Component {
     state = {
         selected: [],
-        voteLimit: 1
+        voteLimit: 1,
+        processingVote: false
     };
 
     toggle = e => {
@@ -26,6 +27,29 @@ class OptionsTableActiveElection extends Component {
         }
         this.setState({ selected });
     };
+
+    vote = async event => {
+        this.setState({ processingVote: true });
+
+        try {
+            await this.props.contract.methods
+                .vote(this.encryptVotes())
+                .send({ from: this.props.userAddresses[0] });
+        } catch (err) {
+            console.log(err.message);
+        }
+
+        this.setState({ processingVote: false });
+        this.forceUpdate();
+    };
+
+    encryptVotes() {
+        let votes = Array(this.props.options.length).fill(0); // TODO: replace with encrypted zero
+        this.state.selected.forEach(option => {
+            votes[option] = 1; // TODO: replace with encrypted one
+        });
+        return votes;
+    }
 
     render() {
         return (
@@ -95,6 +119,8 @@ class OptionsTableActiveElection extends Component {
                             </Table.HeaderCell>
                             <Table.HeaderCell>
                                 <Button
+                                    loading={this.state.processingVote}
+                                    onClick={this.vote}
                                     color="green"
                                     disabled={
                                         !(
