@@ -8,6 +8,7 @@ import Election from "../ethereum/Election.json";
 import ElectionMenu from "./electionComponents/ElectionMenu";
 import ElectionCards from "./electionComponents/ElectionCards";
 import NotRegisteredWarning from "./NotRegisteredWarning";
+import addresses from "../ethereum/addresses";
 
 class Elections extends Component {
     state = {
@@ -104,14 +105,14 @@ class Elections extends Component {
     }
 
     getRegistrationAuthority(web3) {
-        const address = "0x7CA8bDF1721b332fE1F40260c782f605b37B8BbF";
+        const address = addresses.registrationAuthority;
         const abi = JSON.parse(RegistrationAuthority.interface);
         const contract = new web3.eth.Contract(abi, address);
         return contract;
     }
 
     getElectionFactory(web3) {
-        const address = "0x1115b7f57b899651D270470031AC6D6cDEc62364";
+        const address = addresses.electionFactory;
         const abi = JSON.parse(ElectionFactory.interface);
         const contract = new web3.eth.Contract(abi, address);
         return contract;

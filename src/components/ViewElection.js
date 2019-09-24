@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Header, Divider, Segment } from "semantic-ui-react";
+import { Header, Segment } from "semantic-ui-react";
 import OptionsTableActiveElection from "./electionPageComponents/OptionsTableActiveElection";
 import NotRegisteredWarning from "./NotRegisteredWarning";
 import Web3 from "web3";
 import RegistrationAuthority from "../ethereum/RegistrationAuthority.json";
 import ElectionFactory from "../ethereum/ElectionFactory.json";
 import Election from "../ethereum/Election.json";
+import addresses from "../ethereum/addresses";
 
 class ViewElection extends Component {
     state = {
@@ -94,14 +95,14 @@ class ViewElection extends Component {
     }
 
     getRegistrationAuthority(web3) {
-        const address = "0x7CA8bDF1721b332fE1F40260c782f605b37B8BbF";
+        const address = addresses.registrationAuthority;
         const abi = JSON.parse(RegistrationAuthority.interface);
         const contract = new web3.eth.Contract(abi, address);
         return contract;
     }
 
     getElectionFactory(web3) {
-        const address = "0x1115b7f57b899651D270470031AC6D6cDEc62364";
+        const address = addresses.electionFactory;
         const abi = JSON.parse(ElectionFactory.interface);
         const contract = new web3.eth.Contract(abi, address);
         return contract;
