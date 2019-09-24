@@ -7,14 +7,18 @@ import {
     Segment,
     Dimmer,
     Image,
-    Message
+    Message,
+    Icon,
+    Modal,
+    Header
 } from "semantic-ui-react";
 
 class OptionsTableActiveElection extends Component {
     state = {
         selected: [],
         voteLimit: 1,
-        processingVote: false
+        processingVote: false,
+        confirmationOpen: false
     };
 
     toggle = e => {
@@ -39,8 +43,7 @@ class OptionsTableActiveElection extends Component {
             console.log(err.message);
         }
 
-        this.setState({ processingVote: false });
-        this.forceUpdate();
+        this.setState({ processingVote: false, confirmationOpen: true });
     };
 
     encryptVotes() {
@@ -51,92 +54,133 @@ class OptionsTableActiveElection extends Component {
         return votes;
     }
 
+    handleConfirmationClose = () => {
+        this.setState({ confirmationOpen: false });
+    };
+
     render() {
         return (
-            <Table celled compact unstackable>
-                <Table.Header fullWidth>
-                    <Table.Row>
-                        <Table.HeaderCell>Title</Table.HeaderCell>
-                        <Table.HeaderCell>Description</Table.HeaderCell>
-                        {this.props.userIsRegisteredVoter ? (
-                            <Table.HeaderCell textAlign="center">
-                                Vote
-                            </Table.HeaderCell>
-                        ) : null}
-                    </Table.Row>
-                </Table.Header>
+            <React.Fragment>
+                <Modal
+                    open={this.state.confirmationOpen}
+                    onClose={this.handleConfirmationClose}
+                    basic
+                    size="small"
+                >
+                    <Header icon="check" content="Thank you" />
+                    <Modal.Content>
+                        <h3>Your vote has been recorded.</h3>
+                    </Modal.Content>
+                    <Modal.Actions>
+                        <Button
+                            color="green"
+                            onClick={this.handleConfirmationClose}
+                            inverted
+                        >
+                            Got it
+                        </Button>
+                    </Modal.Actions>
+                </Modal>
 
-                <Table.Body>
-                    {this.props.options !== undefined ? (
-                        this.props.options.map((option, i) => (
-                            <Table.Row key={i}>
-                                <Table.Cell>{option.title}</Table.Cell>
-                                <Table.Cell>{option.description}</Table.Cell>
-                                {this.props.userIsRegisteredVoter ? (
-                                    <Table.Cell collapsing textAlign="center">
-                                        <Checkbox
-                                            toggle
-                                            id={i}
-                                            onChange={this.toggle}
-                                        />
-                                    </Table.Cell>
-                                ) : null}
-                            </Table.Row>
-                        ))
-                    ) : (
+                <Table celled compact unstackable>
+                    <Table.Header fullWidth>
                         <Table.Row>
-                            <Table.Cell colSpan="3" textAlign="center">
-                                <Segment>
-                                    <Dimmer active inverted>
-                                        <Loader inverted>Loading</Loader>
-                                    </Dimmer>
-                                    <Image src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
-                                </Segment>
-                            </Table.Cell>
-                        </Table.Row>
-                    )}
-                </Table.Body>
-
-                {this.props.userIsRegisteredVoter ? (
-                    <Table.Footer fullWidth>
-                        <Table.Row>
-                            <Table.HeaderCell colSpan="2">
-                                {this.state.selected.length === 0 ? (
-                                    <Message warning>
-                                        Please select at least one option.
-                                    </Message>
-                                ) : this.state.selected.length >
-                                  this.state.voteLimit ? (
-                                    <Message negative>
-                                        You only have {this.state.voteLimit}{" "}
-                                        {this.state.voteLimit > 1
-                                            ? "votes"
-                                            : "vote"}
-                                        , but selected{" "}
-                                        {this.state.selected.length} options.
-                                    </Message>
-                                ) : null}
-                            </Table.HeaderCell>
-                            <Table.HeaderCell>
-                                <Button
-                                    loading={this.state.processingVote}
-                                    onClick={this.vote}
-                                    color="green"
-                                    disabled={
-                                        !(
-                                            this.state.selected.length > 0 &&
-                                            this.state.selected.length <=
-                                                this.state.voteLimit
-                                        ) || !this.props.userIsRegisteredVoter
-                                    }
-                                >
+                            <Table.HeaderCell>Title</Table.HeaderCell>
+                            <Table.HeaderCell>Description</Table.HeaderCell>
+                            {this.props.userIsRegisteredVoter ? (
+                                <Table.HeaderCell textAlign="center">
                                     Vote
-                                </Button>
-                            </Table.HeaderCell>
+                                </Table.HeaderCell>
+                            ) : null}
                         </Table.Row>
-                    </Table.Footer>
-                ) : null}
-            </Table>
+                    </Table.Header>
+
+                    <Table.Body>
+                        {this.props.options !== undefined ? (
+                            this.props.options.map((option, i) => (
+                                <Table.Row key={i}>
+                                    <Table.Cell>{option.title}</Table.Cell>
+                                    <Table.Cell>
+                                        {option.description}
+                                    </Table.Cell>
+                                    {this.props.userIsRegisteredVoter ? (
+                                        <Table.Cell
+                                            collapsing
+                                            textAlign="center"
+                                        >
+                                            <Checkbox
+                                                toggle
+                                                id={i}
+                                                onChange={this.toggle}
+                                            />
+                                        </Table.Cell>
+                                    ) : null}
+                                </Table.Row>
+                            ))
+                        ) : (
+                            <Table.Row>
+                                <Table.Cell colSpan="3" textAlign="center">
+                                    <Segment>
+                                        <Dimmer active inverted>
+                                            <Loader inverted>Loading</Loader>
+                                        </Dimmer>
+                                        <Image src="https://react.semantic-ui.com/images/wireframe/short-paragraph.png" />
+                                    </Segment>
+                                </Table.Cell>
+                            </Table.Row>
+                        )}
+                    </Table.Body>
+
+                    {this.props.userIsRegisteredVoter ? (
+                        <Table.Footer fullWidth>
+                            <Table.Row>
+                                <Table.HeaderCell colSpan="2">
+                                    {this.state.selected.length === 0 ? (
+                                        <Message warning>
+                                            Please select at least one option.
+                                        </Message>
+                                    ) : this.state.selected.length >
+                                      this.state.voteLimit ? (
+                                        <Message negative>
+                                            You only have {this.state.voteLimit}{" "}
+                                            {this.state.voteLimit > 1
+                                                ? "votes"
+                                                : "vote"}
+                                            , but selected{" "}
+                                            {this.state.selected.length}{" "}
+                                            options.
+                                        </Message>
+                                    ) : null}
+                                </Table.HeaderCell>
+                                <Table.HeaderCell>
+                                    <Button
+                                        animated="fade"
+                                        loading={this.state.processingVote}
+                                        onClick={this.vote}
+                                        color="green"
+                                        disabled={
+                                            !(
+                                                this.state.selected.length >
+                                                    0 &&
+                                                this.state.selected.length <=
+                                                    this.state.voteLimit
+                                            ) ||
+                                            !this.props.userIsRegisteredVoter
+                                        }
+                                    >
+                                        <Button.Content visible>
+                                            Vote
+                                        </Button.Content>
+                                        <Button.Content hidden>
+                                            <Icon name="pencil" />
+                                        </Button.Content>
+                                    </Button>
+                                </Table.HeaderCell>
+                            </Table.Row>
+                        </Table.Footer>
+                    ) : null}
+                </Table>
+            </React.Fragment>
         );
     }
 }
