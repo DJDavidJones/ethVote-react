@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Header, Segment, Message } from "semantic-ui-react";
+import { Header, Segment, Message, Icon } from "semantic-ui-react";
 import OptionsTableActiveElection from "./electionPageComponents/OptionsTableActiveElection";
 import NotRegisteredWarning from "./NotRegisteredWarning";
 import Web3 from "web3";
@@ -18,7 +18,8 @@ class ViewElection extends Component {
         userIsRegisteredVoter: false,
         type: "current",
         contract: undefined,
-        contractDetails: {}
+        contractDetails: {},
+        hasVotedMessageVisible: true
     };
 
     async componentDidMount() {
@@ -134,6 +135,10 @@ class ViewElection extends Component {
         }
     }
 
+    handleDismissHasVotedMessage = () => {
+        this.setState({ hasVotedMessageVisible: false });
+    };
+
     render() {
         const contractStatus = this.getContractStatus(
             this.state.contractDetails.startTime,
@@ -182,10 +187,22 @@ class ViewElection extends Component {
                     </Header>
                 </Segment>
 
-                {this.state.contractDetails.userHasVoted ? (
-                    <Message info>
-                        You have already voted. You can simply vote again, which
-                        will override your previous vote.
+                {this.state.contractDetails.userHasVoted &&
+                this.state.hasVotedMessageVisible ? (
+                    <Message
+                        icon
+                        info
+                        size="small"
+                        onDismiss={this.handleDismissHasVotedMessage}
+                    >
+                        <Icon name="info" />
+                        <Message.Content>
+                            <Message.Header>
+                                You have already voted
+                            </Message.Header>
+                            If you resubmit your vote, your existing vote will
+                            be overwritten.
+                        </Message.Content>
                     </Message>
                 ) : null}
 
