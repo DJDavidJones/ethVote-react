@@ -7,7 +7,7 @@ import ElectionFactory from "../ethereum/ElectionFactory.json";
 import Election from "../ethereum/Election.json";
 import ElectionMenu from "./electionComponents/ElectionMenu";
 import ElectionCards from "./electionComponents/ElectionCards";
-import NotRegisteredWarning from "./electionComponents/NotRegisteredWarning";
+import NotRegisteredWarning from "./NotRegisteredWarning";
 
 class Elections extends Component {
     state = {

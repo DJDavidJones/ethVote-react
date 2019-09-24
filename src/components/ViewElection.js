@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Card, Button } from "semantic-ui-react";
+import { Header, Divider, Segment } from "semantic-ui-react";
+import OptionsTableActiveElection from "./electionPageComponents/OptionsTableActiveElection";
+import NotRegisteredWarning from "./NotRegisteredWarning";
 import Web3 from "web3";
 import RegistrationAuthority from "../ethereum/RegistrationAuthority.json";
 import ElectionFactory from "../ethereum/ElectionFactory.json";
@@ -115,7 +117,26 @@ class ViewElection extends Component {
         window.location.reload();
     };
 
+    getContractStatus(startTime, timeLimit) {
+        const currentTime = Math.round(Date.now() / 1000);
+        try {
+            if (startTime > currentTime) {
+                return "upcoming";
+            } else if (startTime < currentTime && timeLimit > currentTime) {
+                return "current";
+            } else {
+                return "past";
+            }
+        } catch {
+            return "error";
+        }
+    }
+
     render() {
+        const contractStatus = this.getContractStatus(
+            this.state.contractDetails.startTime,
+            this.state.contractDetails.timeLimit
+        );
         return (
             <React.Fragment>
                 {this.state.redirect ? <Redirect to="/metamask" /> : null}
@@ -126,18 +147,58 @@ class ViewElection extends Component {
 
                 {this.state.electionNotFound ? <Redirect to="/error" /> : null}
 
-                <h1>{this.state.contractDetails.title}</h1>
-                <p>{this.state.contractDetails.description}</p>
-                <p>{this.props.match.params.address}</p>
+                <Segment clearing>
+                    <Header as="h2" floated="left">
+                        {this.state.contractDetails.title}
+                        <Header.Subheader>
+                            {this.state.contractDetails.description}
+                        </Header.Subheader>
+                    </Header>
+                    <Header as="h2" floated="right" textAlign="right">
+                        {contractStatus !== "error" ? (
+                            contractStatus === "past" ? (
+                                <React.Fragment>
+                                    <Header.Subheader>
+                                        lasted until
+                                    </Header.Subheader>
+                                    {this.state.contractDetails.timeLimit}
+                                </React.Fragment>
+                            ) : contractStatus === "current" ? (
+                                <React.Fragment>
+                                    <Header.Subheader>
+                                        lasts until
+                                    </Header.Subheader>
+                                    {this.state.contractDetails.timeLimit}
+                                </React.Fragment>
+                            ) : (
+                                <React.Fragment>
+                                    <Header.Subheader>starts</Header.Subheader>
+                                    {this.state.contractDetails.startTime}
+                                </React.Fragment>
+                            )
+                        ) : null}
+                    </Header>
+                </Segment>
 
-                <Card fluid>
-                    <Card.Content>
-                        <Card.Header>Options</Card.Header>
-                    </Card.Content>
-                    <Card.Content>
-                        <Button floated="right">Vote</Button>
-                    </Card.Content>
-                </Card>
+                {contractStatus !== "error" ? (
+                    contractStatus === "past" ? (
+                        "past"
+                    ) : contractStatus === "current" ? (
+                        <React.Fragment>
+                            {!this.state.userIsRegisteredVoter ? (
+                                <NotRegisteredWarning />
+                            ) : null}
+                            <OptionsTableActiveElection
+                                options={this.state.contractDetails.options}
+                                userIsRegisteredVoter={
+                                    this.state.userIsRegisteredVoter
+                                }
+                            />
+                        </React.Fragment>
+                    ) : (
+                        "upcoming"
+                    )
+                ) : null}
             </React.Fragment>
         );
     }
