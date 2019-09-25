@@ -163,7 +163,7 @@ class OptionsTableActiveElection extends Component {
                                             Vote
                                         </Button.Content>
                                         <Button.Content hidden>
-                                            <Icon name="pencil" />
+                                            <Icon name="envelope" />
                                         </Button.Content>
                                     </Button>
                                 </Table.HeaderCell>

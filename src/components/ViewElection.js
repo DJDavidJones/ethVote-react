@@ -1,21 +1,15 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import {
-    Header,
-    Segment,
-    Message,
-    Icon,
-    Dimmer,
-    Loader,
-    Image
-} from "semantic-ui-react";
+import { Header, Segment, Message, Icon, Image } from "semantic-ui-react";
 import OptionsTableActiveElection from "./electionPageComponents/OptionsTableActiveElection";
+import GeneralInformationHeader from "./electionPageComponents/GeneralInformationHeader";
 import NotRegisteredWarning from "./NotRegisteredWarning";
 import Web3 from "web3";
 import RegistrationAuthority from "../ethereum/RegistrationAuthority.json";
 import ElectionFactory from "../ethereum/ElectionFactory.json";
 import Election from "../ethereum/Election.json";
 import addresses from "../ethereum/addresses";
+import getContractStatus from "../utils/getContractStatus";
 
 class ViewElection extends Component {
     state = {
@@ -129,27 +123,12 @@ class ViewElection extends Component {
         window.location.reload();
     };
 
-    getContractStatus(startTime, timeLimit) {
-        const currentTime = Math.round(Date.now() / 1000);
-        try {
-            if (startTime > currentTime) {
-                return "upcoming";
-            } else if (startTime < currentTime && timeLimit > currentTime) {
-                return "current";
-            } else {
-                return "past";
-            }
-        } catch {
-            return "error";
-        }
-    }
-
     handleDismissHasVotedMessage = () => {
         this.setState({ hasVotedMessageVisible: false });
     };
 
     render() {
-        const contractStatus = this.getContractStatus(
+        const contractStatus = getContractStatus(
             this.state.contractDetails.startTime,
             this.state.contractDetails.timeLimit
         );
@@ -167,38 +146,12 @@ class ViewElection extends Component {
 
                 {this.state.electionNotFound ? <Redirect to="/error" /> : null}
 
-                <Segment clearing>
-                    <Header as="h2" floated="left">
-                        {this.state.contractDetails.title}
-                        <Header.Subheader>
-                            {this.state.contractDetails.description}
-                        </Header.Subheader>
-                    </Header>
-                    <Header as="h2" floated="right" textAlign="right">
-                        {contractStatus !== "error" ? (
-                            contractStatus === "past" ? (
-                                <React.Fragment>
-                                    <Header.Subheader>
-                                        lasted until
-                                    </Header.Subheader>
-                                    {this.state.contractDetails.timeLimit}
-                                </React.Fragment>
-                            ) : contractStatus === "current" ? (
-                                <React.Fragment>
-                                    <Header.Subheader>
-                                        lasts until
-                                    </Header.Subheader>
-                                    {this.state.contractDetails.timeLimit}
-                                </React.Fragment>
-                            ) : (
-                                <React.Fragment>
-                                    <Header.Subheader>starts</Header.Subheader>
-                                    {this.state.contractDetails.startTime}
-                                </React.Fragment>
-                            )
-                        ) : null}
-                    </Header>
-                </Segment>
+                <GeneralInformationHeader
+                    title={this.state.contractDetails.title}
+                    description={this.state.contractDetails.description}
+                    startTime={this.state.contractDetails.startTime}
+                    timeLimit={this.state.contractDetails.timeLimit}
+                />
 
                 {this.state.contractDetails.userHasVoted &&
                 this.state.hasVotedMessageVisible ? (

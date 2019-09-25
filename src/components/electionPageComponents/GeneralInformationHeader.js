@@ -1,25 +1,19 @@
 import React, { Component } from "react";
-import { Card, Icon } from "semantic-ui-react";
-import ElectionButton from "./ElectionButton";
+import { Header } from "semantic-ui-react";
+import getContractStatus from "../../utils/getContractStatus";
 import formatTimestamp from "../../utils/formatTimestamp";
 
-class ElectionCard extends Component {
+class GeneralInformationHeader extends Component {
     render() {
         return (
-            <Card fluid>
-                <Card.Content>
-                    <ElectionButton
-                        activeItem={this.props.activeItem}
-                        userHasVoted={this.props.userHasVoted}
-                        userIsRegisteredVoter={this.props.userIsRegisteredVoter}
-                        contractAddress={this.props.address}
-                    />
-                    <Card.Header>{this.props.title}</Card.Header>
-                    <Card.Meta>{this.props.description}</Card.Meta>
-                </Card.Content>
-                <Card.Content extra>
-                    <Icon name="clock" />
-                    {this.props.activeItem === "past" ? (
+            <Header as="h2" textAlign="center">
+                {this.props.title}
+                <Header.Subheader>{this.props.description}</Header.Subheader>
+                <Header.Subheader>
+                    {getContractStatus(
+                        this.props.startTime,
+                        this.props.timeLimit
+                    ) === "past" ? (
                         <React.Fragment>
                             from{" "}
                             <strong>
@@ -30,7 +24,10 @@ class ElectionCard extends Component {
                                 {formatTimestamp(this.props.timeLimit)}
                             </strong>
                         </React.Fragment>
-                    ) : this.props.activeItem === "current" ? (
+                    ) : getContractStatus(
+                          this.props.startTime,
+                          this.props.timeLimit
+                      ) === "current" ? (
                         <React.Fragment>
                             ending{" "}
                             <strong>
@@ -42,29 +39,17 @@ class ElectionCard extends Component {
                             starting{" "}
                             <strong>
                                 {formatTimestamp(this.props.startTime)}
-                            </strong>
+                            </strong>{" "}
                             , lasting until{" "}
                             <strong>
                                 {formatTimestamp(this.props.timeLimit)}
                             </strong>
                         </React.Fragment>
                     )}
-                </Card.Content>
-            </Card>
+                </Header.Subheader>
+            </Header>
         );
-    }
-
-    formatTimestamp(timestamp) {
-        const options = {
-            day: "2-digit",
-            year: "numeric",
-            month: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit"
-        };
-
-        return new Date(timestamp * 1000).toLocaleDateString("da", options);
     }
 }
 
-export default ElectionCard;
+export default GeneralInformationHeader;
