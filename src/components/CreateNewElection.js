@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Header, Form, Button } from "semantic-ui-react";
+import { Header, Form, Button, Label } from "semantic-ui-react";
 import { DateTimeInput } from "semantic-ui-calendar-react";
 import ElectionFactory from "../ethereum/ElectionFactory.json";
 import convertTimeStringToDate from "../utils/convertTimeStringToDate";
@@ -14,12 +14,17 @@ class CreateNewElection extends Component {
         electionFactory: undefined,
         userIsManager: true,
         title: "",
+        titleChangedOnce: false,
         description: "",
+        descriptionChangedOnce: false,
         startTime: "",
+        startTimeChangedOnce: false,
         timeLimit: "",
+        timeLimitChangedOnce: false,
         processingTransaction: false,
         successful: false,
-        errorMessage: ""
+        errorMessage: "",
+        inputsValid: false
     };
 
     async componentDidMount() {
@@ -87,7 +92,36 @@ class CreateNewElection extends Component {
         window.location.reload();
     };
 
-    handleChange = (e, { name, value }) => this.setState({ [name]: value });
+    handleChange = (e, { name, value }) => {
+        switch (name) {
+            case "title":
+                this.setState({ titleChangedOnce: true });
+                break;
+            case "description":
+                this.setState({ descriptionChangedOnce: true });
+                break;
+            case "startTime":
+                this.setState({ startTimeChangedOnce: true });
+                break;
+            case "timeLimit":
+                this.setState({ timeLimitChangedOnce: true });
+                break;
+            default:
+                break;
+        }
+
+        this.setState({ [name]: value }, function() {
+            // callback because state isn't updated immediately
+            if (
+                this.state.title &&
+                this.state.description &&
+                this.state.startTime &&
+                this.state.timeLimit
+            ) {
+                this.setState({ inputsValid: true });
+            }
+        });
+    };
 
     handleSubmit = async event => {
         event.preventDefault();
@@ -146,6 +180,7 @@ class CreateNewElection extends Component {
                         value={this.state.title}
                         onChange={this.handleChange}
                         fluid
+                        error={!this.state.title && this.state.titleChangedOnce}
                     />
                     <Form.Input
                         label="Description"
@@ -154,6 +189,10 @@ class CreateNewElection extends Component {
                         value={this.state.description}
                         onChange={this.handleChange}
                         fluid
+                        error={
+                            !this.state.description &&
+                            this.state.descriptionChangedOnce
+                        }
                     />
                     <Form.Group widths={2}>
                         <DateTimeInput
@@ -167,6 +206,10 @@ class CreateNewElection extends Component {
                             clearable
                             closable
                             hideMobileKeyboard
+                            error={
+                                !this.state.startTime &&
+                                this.state.startTimeChangedOnce
+                            }
                         />
                         <DateTimeInput
                             label="Time Limit"
@@ -179,12 +222,18 @@ class CreateNewElection extends Component {
                             clearable
                             closable
                             hideMobileKeyboard
+                            error={
+                                !this.state.timeLimit &&
+                                this.state.timeLimitChangedOnce
+                            }
                         />
                     </Form.Group>
                     <Button
                         type="submit"
                         fluid
                         loading={this.state.processingTransaction}
+                        color="green"
+                        disabled={!this.state.inputsValid}
                     >
                         Create
                     </Button>
