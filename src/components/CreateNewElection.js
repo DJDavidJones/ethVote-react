@@ -1,12 +1,11 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Header, Form, Button, Label } from "semantic-ui-react";
+import { Header, Form, Button } from "semantic-ui-react";
 import { DateTimeInput } from "semantic-ui-calendar-react";
 import ElectionFactory from "../ethereum/ElectionFactory.json";
 import convertTimeStringToDate from "../utils/convertTimeStringToDate";
 import addresses from "../ethereum/addresses";
 import Web3 from "web3";
-import networkVersion from "../ethereum/networkVersion";
 import ProcessingCreateElectionModal from "./createElectionComponents/ProcessingCreateElectionModal";
 
 class CreateNewElection extends Component {
@@ -52,15 +51,6 @@ class CreateNewElection extends Component {
             const userAddresses = await web3.eth.getAccounts();
 
             if (
-                window.web3.currentProvider.networkVersion !==
-                networkVersion.version
-            ) {
-                this.setState(function(prevState, props) {
-                    return { wrongNetwork: true };
-                });
-            }
-
-            if (
                 (await electionFactory.methods.factoryManager().call()) !==
                 userAddresses[0]
             ) {
@@ -76,6 +66,11 @@ class CreateNewElection extends Component {
                 // Metamask not installed
                 this.setState(function(prevState, props) {
                     return { redirect: true };
+                });
+            } else {
+                // Wrong Ethereum network
+                this.setState(function(prevState, props) {
+                    return { wrongNetwork: true };
                 });
             }
         }
