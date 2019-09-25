@@ -7,6 +7,7 @@ import convertTimeStringToDate from "../utils/convertTimeStringToDate";
 import addresses from "../ethereum/addresses";
 import Web3 from "web3";
 import networkVersion from "../ethereum/networkVersion";
+import ProcessingCreateElectionModal from "./createElectionComponents/ProcessingCreateElectionModal";
 
 class CreateNewElection extends Component {
     state = {
@@ -105,7 +106,6 @@ class CreateNewElection extends Component {
                 .send({ from: this.state.userAddresses[0] });
         } catch (err) {
             errorMessage = err.message;
-            console.log(errorMessage);
         }
 
         this.setState({
@@ -113,6 +113,10 @@ class CreateNewElection extends Component {
             successful: true,
             errorMessage
         });
+    };
+
+    handleConfirmationClose = () => {
+        this.setState({ successful: false });
     };
 
     render() {
@@ -125,6 +129,13 @@ class CreateNewElection extends Component {
                 ) : null}
 
                 {this.state.userIsManager ? null : <Redirect to="/" />}
+
+                <ProcessingCreateElectionModal
+                    successful={this.state.successful}
+                    processingTransaction={this.state.processingTransaction}
+                    errorMessage={this.state.errorMessage}
+                    handleConfirmationClose={this.handleConfirmationClose}
+                />
 
                 <Header as="h1">Create Election</Header>
                 <Form onSubmit={this.handleSubmit}>
