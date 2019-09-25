@@ -90,7 +90,7 @@ class ViewElection extends Component {
             } else {
                 // Wrong Ethereum network
                 this.setState(function(prevState, props) {
-                    return { wrongNetwork: false };
+                    return { wrongNetwork: true };
                 });
             }
         }

@@ -8,17 +8,17 @@ import {
     Dimmer,
     Image,
     Message,
-    Icon,
-    Modal,
-    Header
+    Icon
 } from "semantic-ui-react";
+import ProcessingVoteModal from "./ProcessingVoteModal";
 
 class OptionsTableActiveElection extends Component {
     state = {
         selected: [],
         voteLimit: 1,
         processingVote: false,
-        confirmationOpen: false
+        confirmationOpen: false,
+        errorMessage: ""
     };
 
     toggle = e => {
@@ -35,15 +35,20 @@ class OptionsTableActiveElection extends Component {
     vote = async event => {
         this.setState({ processingVote: true });
 
+        let errorMessage = "";
         try {
             await this.props.contract.methods
                 .vote(this.encryptVotes())
                 .send({ from: this.props.userAddresses[0] });
         } catch (err) {
-            console.log(err.message);
+            errorMessage = err.message;
         }
 
-        this.setState({ processingVote: false, confirmationOpen: true });
+        this.setState({
+            processingVote: false,
+            confirmationOpen: true,
+            errorMessage
+        });
     };
 
     encryptVotes() {
@@ -61,26 +66,12 @@ class OptionsTableActiveElection extends Component {
     render() {
         return (
             <React.Fragment>
-                <Modal
-                    open={this.state.confirmationOpen}
-                    onClose={this.handleConfirmationClose}
-                    basic
-                    size="small"
-                >
-                    <Header icon="check" content="Thank you" />
-                    <Modal.Content>
-                        <h3>Your vote has been recorded.</h3>
-                    </Modal.Content>
-                    <Modal.Actions>
-                        <Button
-                            color="green"
-                            onClick={this.handleConfirmationClose}
-                            inverted
-                        >
-                            Got it
-                        </Button>
-                    </Modal.Actions>
-                </Modal>
+                <ProcessingVoteModal
+                    confirmationOpen={this.state.confirmationOpen}
+                    processingVote={this.state.processingVote}
+                    errorMessage={this.state.errorMessage}
+                    handleConfirmationClose={this.handleConfirmationClose}
+                />
 
                 <Table celled compact unstackable>
                     <Table.Header fullWidth>
