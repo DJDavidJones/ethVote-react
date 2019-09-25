@@ -9,6 +9,7 @@ import Error from "./components/Error";
 import Header from "./components/Header";
 import { Container } from "semantic-ui-react";
 import ViewElection from "./components/ViewElection";
+import CreateNewElection from "./components/CreateNewElection";
 
 class App extends Component {
     render() {
@@ -34,6 +35,7 @@ class App extends Component {
                             path="/election/:address"
                             component={ViewElection}
                         />
+                        <Route path="/new" component={CreateNewElection} />
                         <Route component={Error} />
                     </Switch>
                 </Container>

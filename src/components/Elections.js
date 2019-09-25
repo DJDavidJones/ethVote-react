@@ -9,12 +9,14 @@ import ElectionMenu from "./electionComponents/ElectionMenu";
 import ElectionCards from "./electionComponents/ElectionCards";
 import NotRegisteredWarning from "./NotRegisteredWarning";
 import addresses from "../ethereum/addresses";
+import ManagerInfoMessage from "./ManagerInfoMessage.js";
 
 class Elections extends Component {
     state = {
         redirect: false,
         showLoader: true,
         userIsRegisteredVoter: false,
+        userIsManager: false,
         wrongNetwork: false,
         activeItem: "current",
         elections: []
@@ -80,13 +82,20 @@ class Elections extends Component {
                 .voters(userAddresses[0])
                 .call();
 
+            // Check if user is election factory manager
+            const manager = await electionFactory.methods
+                .factoryManager()
+                .call();
+            const userIsManager = manager === userAddresses[0];
+
             this.setState(function(prevState, props) {
                 return {
                     showLoader: false,
                     web3,
                     regAuthority,
                     electionFactory,
-                    userIsRegisteredVoter: registered
+                    userIsRegisteredVoter: registered,
+                    userIsManager
                 };
             });
         } catch (err) {
@@ -133,6 +142,10 @@ class Elections extends Component {
     render() {
         return (
             <React.Fragment>
+                {this.state.userIsManager && this.state.showLoader === false ? (
+                    <ManagerInfoMessage />
+                ) : null}
+
                 {this.state.userIsRegisteredVoter === false &&
                 this.state.showLoader === false ? (
                     <NotRegisteredWarning />

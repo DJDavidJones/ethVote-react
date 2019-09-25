@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Header, Segment, Message, Icon, Image } from "semantic-ui-react";
+import { Segment, Message, Icon, Image } from "semantic-ui-react";
 import OptionsTableActiveElection from "./electionPageComponents/OptionsTableActiveElection";
 import GeneralInformationHeader from "./electionPageComponents/GeneralInformationHeader";
 import NotRegisteredWarning from "./NotRegisteredWarning";
