@@ -1,7 +1,17 @@
 import React, { Component } from "react";
-import { Modal, Icon, Button, Progress } from "semantic-ui-react";
+import { Modal, Icon, Button, Accordion } from "semantic-ui-react";
 
 class ProcessingTransactionModal extends Component {
+    state = {
+        showingErrorMessage: false
+    };
+
+    handleErrorAccordion = () => {
+        this.setState(function(prevState, props) {
+            return { showingErrorMessage: !prevState.showingErrorMessage };
+        });
+    };
+
     render() {
         return (
             <Modal
@@ -29,16 +39,38 @@ class ProcessingTransactionModal extends Component {
                     )}
                 </Modal.Header>
                 <Modal.Content>
-                    {this.props.processingVote ? <p>Loading</p> : null}
+                    {this.props.processingVote ? (
+                        "This usually takes around 15 seconds. Please stay with us."
+                    ) : this.props.errorMessage ? (
+                        <Accordion>
+                            <Accordion.Title
+                                active={this.state.showingErrorMessage}
+                                onClick={this.handleErrorAccordion}
+                            >
+                                <Icon name="dropdown" />
+                                We encountered an error. Please try again.
+                            </Accordion.Title>
+                            <Accordion.Content
+                                active={this.state.showingErrorMessage}
+                            >
+                                <p>{this.props.errorMessage}</p>
+                            </Accordion.Content>
+                        </Accordion>
+                    ) : (
+                        "Thank you, your vote has been counted."
+                    )}
                 </Modal.Content>
-                <Modal.Actions>
-                    <Button
-                        color="green"
-                        onClick={this.props.handleConfirmationClose}
-                    >
-                        Got it
-                    </Button>
-                </Modal.Actions>
+
+                {this.props.processingVote ? null : (
+                    <Modal.Actions>
+                        <Button
+                            color="green"
+                            onClick={this.props.handleConfirmationClose}
+                        >
+                            Got it
+                        </Button>
+                    </Modal.Actions>
+                )}
             </Modal>
         );
     }
