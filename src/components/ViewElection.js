@@ -1,6 +1,14 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Header, Segment, Message, Icon } from "semantic-ui-react";
+import {
+    Header,
+    Segment,
+    Message,
+    Icon,
+    Dimmer,
+    Loader,
+    Image
+} from "semantic-ui-react";
 import OptionsTableActiveElection from "./electionPageComponents/OptionsTableActiveElection";
 import NotRegisteredWarning from "./NotRegisteredWarning";
 import Web3 from "web3";
@@ -72,6 +80,7 @@ class ViewElection extends Component {
                 .call();
 
             this.setState({
+                showLoader: false,
                 contract,
                 contractDetails,
                 userIsRegisteredVoter: registered,
@@ -144,7 +153,11 @@ class ViewElection extends Component {
             this.state.contractDetails.startTime,
             this.state.contractDetails.timeLimit
         );
-        return (
+        return this.state.showLoader ? (
+            <Segment loading>
+                <Image src="https://react.semantic-ui.com/images/wireframe/paragraph.png" />
+            </Segment>
+        ) : (
             <React.Fragment>
                 {this.state.redirect ? <Redirect to="/metamask" /> : null}
 
