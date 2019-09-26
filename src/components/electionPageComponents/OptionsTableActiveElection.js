@@ -10,14 +10,14 @@ import {
     Message,
     Icon
 } from "semantic-ui-react";
-import ProcessingVoteModal from "./ProcessingVoteModal";
+import ProcessingModal from "../ProcessingModal";
 
 class OptionsTableActiveElection extends Component {
     state = {
         selected: [],
         voteLimit: 1,
-        processingVote: false,
-        confirmationOpen: false,
+        modalOpen: false,
+        modalState: "",
         errorMessage: ""
     };
 
@@ -33,22 +33,17 @@ class OptionsTableActiveElection extends Component {
     };
 
     vote = async event => {
-        this.setState({ processingVote: true });
+        this.setState({ modalOpen: true, modalState: "processing" });
 
-        let errorMessage = "";
         try {
             await this.props.contract.methods
                 .vote(this.encryptVotes())
                 .send({ from: this.props.userAddresses[0] });
-        } catch (err) {
-            errorMessage = err.message;
-        }
 
-        this.setState({
-            processingVote: false,
-            confirmationOpen: true,
-            errorMessage
-        });
+            this.setState({ modalState: "success" });
+        } catch (err) {
+            this.setState({ modalState: "error", errorMessage: err.message });
+        }
     };
 
     encryptVotes() {
@@ -59,18 +54,21 @@ class OptionsTableActiveElection extends Component {
         return votes;
     }
 
-    handleConfirmationClose = () => {
-        this.setState({ confirmationOpen: false });
+    handleModalClose = () => {
+        this.setState({ modalOpen: false });
     };
 
     render() {
         return (
             <React.Fragment>
-                <ProcessingVoteModal
-                    confirmationOpen={this.state.confirmationOpen}
-                    processingVote={this.state.processingVote}
-                    errorMessage={this.state.errorMessage}
-                    handleConfirmationClose={this.handleConfirmationClose}
+                <ProcessingModal
+                    modalOpen={this.state.modalOpen}
+                    modalState={this.state.modalState}
+                    handleModalClose={this.handleModalClose}
+                    errorMessageDetailed={this.state.errorMessage}
+                    processingMessage="This usually takes around 15 seconds. Please stay with us."
+                    errorMessage="We encountered an error. Please try again."
+                    successMessage="Your vote has been counted. Thank you."
                 />
 
                 <Table celled compact unstackable>

@@ -6,7 +6,7 @@ import ElectionFactory from "../ethereum/ElectionFactory.json";
 import convertTimeStringToDate from "../utils/convertTimeStringToDate";
 import addresses from "../ethereum/addresses";
 import Web3 from "web3";
-import ProcessingCreateElectionModal from "./createElectionComponents/ProcessingCreateElectionModal";
+import ProcessingModal from "./ProcessingModal";
 
 class CreateNewElection extends Component {
     state = {
@@ -20,10 +20,10 @@ class CreateNewElection extends Component {
         startTimeChangedOnce: false,
         timeLimit: "",
         timeLimitChangedOnce: false,
-        processingTransaction: false,
-        successful: false,
-        errorMessage: "",
-        inputsValid: false
+        inputsValid: false,
+        modalOpen: false,
+        modalState: "",
+        errorMessage: ""
     };
 
     async componentDidMount() {
@@ -121,9 +121,8 @@ class CreateNewElection extends Component {
     handleSubmit = async event => {
         event.preventDefault();
 
-        this.setState({ processingTransaction: true });
+        this.setState({ modalOpen: true, modalState: "processing" });
 
-        let errorMessage = "";
         try {
             await this.state.electionFactory.methods
                 .createElection(
@@ -133,19 +132,15 @@ class CreateNewElection extends Component {
                     convertTimeStringToDate(this.state.timeLimit)
                 )
                 .send({ from: this.state.userAddresses[0] });
-        } catch (err) {
-            errorMessage = err.message;
-        }
 
-        this.setState({
-            processingTransaction: false,
-            successful: true,
-            errorMessage
-        });
+            this.setState({ modalState: "success" });
+        } catch (err) {
+            this.setState({ modalState: "error", errorMessage: err.message });
+        }
     };
 
-    handleConfirmationClose = () => {
-        this.setState({ successful: false });
+    handleModalClose = () => {
+        this.setState({ modalOpen: false });
     };
 
     render() {
@@ -159,11 +154,14 @@ class CreateNewElection extends Component {
 
                 {this.state.userIsManager ? null : <Redirect to="/" />}
 
-                <ProcessingCreateElectionModal
-                    successful={this.state.successful}
-                    processingTransaction={this.state.processingTransaction}
-                    errorMessage={this.state.errorMessage}
-                    handleConfirmationClose={this.handleConfirmationClose}
+                <ProcessingModal
+                    modalOpen={this.state.modalOpen}
+                    modalState={this.state.modalState}
+                    handleModalClose={this.handleModalClose}
+                    errorMessageDetailed={this.state.errorMessage}
+                    processingMessage="This usually takes around 30 seconds. Please stay with us."
+                    errorMessage="We encountered an error. Please try again."
+                    successMessage="The contract has been created."
                 />
 
                 <Header as="h1">Create Election</Header>
