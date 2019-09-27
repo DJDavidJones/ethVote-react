@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Header, Form, Button } from "semantic-ui-react";
+import { Header, Form, Button, Segment } from "semantic-ui-react";
 import { DateTimeInput } from "semantic-ui-calendar-react";
 import ElectionFactory from "../ethereum/ElectionFactory.json";
 import convertTimeStringToDate from "../utils/convertTimeStringToDate";
@@ -23,7 +23,9 @@ class CreateNewElection extends Component {
         inputsValid: false,
         modalOpen: false,
         modalState: "",
-        errorMessage: ""
+        errorMessage: "",
+        publicKey: "",
+        privateKey: ""
     };
 
     async componentDidMount() {
@@ -143,6 +145,14 @@ class CreateNewElection extends Component {
         this.setState({ modalOpen: false });
     };
 
+    copyPublicKey = () => {
+        navigator.clipboard.writeText(this.state.publicKey);
+    };
+
+    copyPrivateKey = () => {
+        navigator.clipboard.writeText(this.state.privateKey);
+    };
+
     render() {
         return (
             <React.Fragment>
@@ -165,71 +175,114 @@ class CreateNewElection extends Component {
                 />
 
                 <Header as="h1">Create Election</Header>
+
                 <Form onSubmit={this.handleSubmit}>
-                    <Form.Input
-                        label="Title"
-                        placeholder="Title"
-                        name="title"
-                        value={this.state.title}
-                        onChange={this.handleChange}
-                        fluid
-                        error={!this.state.title && this.state.titleChangedOnce}
-                    />
-                    <Form.Input
-                        label="Description"
-                        placeholder="Description"
-                        name="description"
-                        value={this.state.description}
-                        onChange={this.handleChange}
-                        fluid
-                        error={
-                            !this.state.description &&
-                            this.state.descriptionChangedOnce
-                        }
-                    />
-                    <Form.Group widths={2}>
-                        <DateTimeInput
-                            label="Start Time"
-                            name="startTime"
-                            placeholder="Start Time"
-                            value={this.state.startTime}
-                            iconPosition="left"
+                    <Header as="h4" attached="top">
+                        General Information
+                    </Header>
+                    <Segment attached>
+                        <Form.Input
+                            label="Title"
+                            placeholder="Title"
+                            name="title"
+                            value={this.state.title}
                             onChange={this.handleChange}
-                            dateFormat={"DD.MM.YYYY"}
-                            clearable
-                            closable
-                            hideMobileKeyboard
+                            fluid
                             error={
-                                !this.state.startTime &&
-                                this.state.startTimeChangedOnce
+                                !this.state.title && this.state.titleChangedOnce
                             }
                         />
-                        <DateTimeInput
-                            label="Time Limit"
-                            name="timeLimit"
-                            placeholder="Time Limit"
-                            value={this.state.timeLimit}
-                            iconPosition="left"
+                        <Form.Input
+                            label="Description"
+                            placeholder="Description"
+                            name="description"
+                            value={this.state.description}
                             onChange={this.handleChange}
-                            dateFormat={"DD.MM.YYYY"}
-                            clearable
-                            closable
-                            hideMobileKeyboard
+                            fluid
                             error={
-                                !this.state.timeLimit &&
-                                this.state.timeLimitChangedOnce
+                                !this.state.description &&
+                                this.state.descriptionChangedOnce
                             }
                         />
-                    </Form.Group>
-                    <Button
-                        type="submit"
-                        fluid
-                        loading={this.state.processingTransaction}
-                        color="green"
-                        disabled={!this.state.inputsValid}
-                    >
-                        Create
-                    </Button>
+                        <Form.Group widths={2}>
+                            <DateTimeInput
+                                label="Start Time"
+                                name="startTime"
+                                placeholder="Start Time"
+                                value={this.state.startTime}
+                                iconPosition="left"
+                                onChange={this.handleChange}
+                                dateFormat={"DD.MM.YYYY"}
+                                clearable
+                                closable
+                                hideMobileKeyboard
+                                error={
+                                    !this.state.startTime &&
+                                    this.state.startTimeChangedOnce
+                                }
+                            />
+                            <DateTimeInput
+                                label="Time Limit"
+                                name="timeLimit"
+                                placeholder="Time Limit"
+                                value={this.state.timeLimit}
+                                iconPosition="left"
+                                onChange={this.handleChange}
+                                dateFormat={"DD.MM.YYYY"}
+                                clearable
+                                closable
+                                hideMobileKeyboard
+                                error={
+                                    !this.state.timeLimit &&
+                                    this.state.timeLimitChangedOnce
+                                }
+                            />
+                        </Form.Group>
+                    </Segment>
+
+                    <Header as="h4" attached="top">
+                        Encryption Settings
+                    </Header>
+                    <Segment attached>
+                        <Form.Input
+                            action={{
+                                labelPosition: "right",
+                                icon: "copy",
+                                content: "Copy",
+                                type: "button",
+                                onClick: this.copyPublicKey
+                            }}
+                            value={this.state.publicKey}
+                            readOnly
+                            fluid
+                            label="Public encryption key"
+                        />
+                        <Form.Input
+                            action={{
+                                labelPosition: "right",
+                                icon: "copy",
+                                content: "Copy",
+                                type: "button",
+                                onClick: this.copyPrivateKey
+                            }}
+                            value={this.state.privateKey}
+                            readOnly
+                            fluid
+                            label="Private decryption key"
+                        />
+                    </Segment>
+
+                    <Segment vertical>
+                        <Button
+                            type="submit"
+                            fluid
+                            loading={this.state.processingTransaction}
+                            color="green"
+                            disabled={!this.state.inputsValid}
+                        >
+                            Create
+                        </Button>
+                    </Segment>
                 </Form>
             </React.Fragment>
         );
