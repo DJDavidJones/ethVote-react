@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Header, Form, Button, Segment } from "semantic-ui-react";
+import { Header, Form, Button, Segment, Icon } from "semantic-ui-react";
 import { DateTimeInput } from "semantic-ui-calendar-react";
 import ElectionFactory from "../ethereum/ElectionFactory.json";
 import convertTimeStringToDate from "../utils/convertTimeStringToDate";
 import addresses from "../ethereum/addresses";
 import Web3 from "web3";
 import ProcessingModal from "./ProcessingModal";
+import paillier from "paillier-js";
+import FileSaver from "file-saver";
 
 class CreateNewElection extends Component {
     state = {
@@ -24,12 +26,14 @@ class CreateNewElection extends Component {
         modalOpen: false,
         modalState: "",
         errorMessage: "",
-        publicKey: "",
-        privateKey: ""
+        generatedKeyPair: false,
+        publicKey: {},
+        privateKey: {}
     };
 
     async componentDidMount() {
         await this.loadContract();
+        this.generateKeys();
     }
 
     async loadContract() {
@@ -76,6 +80,15 @@ class CreateNewElection extends Component {
                 });
             }
         }
+    }
+
+    generateKeys() {
+        const { publicKey, privateKey } = paillier.generateRandomKeys(1024);
+        this.setState({
+            publicKey,
+            privateKey,
+            generatedKeyPair: true
+        });
     }
 
     getElectionFactory(web3) {
@@ -145,12 +158,15 @@ class CreateNewElection extends Component {
         this.setState({ modalOpen: false });
     };
 
-    copyPublicKey = () => {
-        navigator.clipboard.writeText(this.state.publicKey);
+    copyKey = () => {
+        navigator.clipboard.writeText(JSON.stringify(this.state.privateKey));
     };
 
-    copyPrivateKey = () => {
-        navigator.clipboard.writeText(this.state.privateKey);
+    saveKeyToFile = () => {
+        let blob = new Blob([JSON.stringify(this.state.privateKey)], {
+            type: "application/json;charset=utf-8"
+        });
+        FileSaver.saveAs(blob, "privatekey.json");
     };
 
     render() {
@@ -244,32 +260,35 @@ class CreateNewElection extends Component {
                         Encryption Settings
                     </Header>
                     <Segment attached>
-                        <Form.Input
-                            action={{
-                                labelPosition: "right",
-                                icon: "copy",
-                                content: "Copy",
-                                type: "button",
-                                onClick: this.copyPublicKey
-                            }}
-                            value={this.state.publicKey}
+                        <Form.TextArea
+                            label="Private and Public key"
+                            value={
+                                this.state.generatedKeyPair
+                                    ? JSON.stringify(this.state.privateKey)
+                                    : "Generating keys..."
+                            }
                             readOnly
-                            fluid
-                            label="Public encryption key"
+                            style={{ minHeight: 100 }}
                         />
-                        <Form.Input
-                            action={{
-                                labelPosition: "right",
-                                icon: "copy",
-                                content: "Copy",
-                                type: "button",
-                                onClick: this.copyPrivateKey
-                            }}
-                            value={this.state.privateKey}
-                            readOnly
-                            fluid
-                            label="Private decryption key"
-                        />
+
+                        <Button
+                            type="button"
+                            icon
+                            labelPosition="left"
+                            onClick={this.copyKey}
+                        >
+                            <Icon name="copy" />
+                            Copy
+                        </Button>
+                        <Button
+                            type="button"
+                            icon
+                            labelPosition="left"
+                            onClick={this.saveKeyToFile}
+                        >
+                            <Icon name="save" />
+                            Save
+                        </Button>
                     </Segment>
 
                     <Segment vertical>
