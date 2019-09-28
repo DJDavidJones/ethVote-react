@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Header, Form, Button, Segment, Icon } from "semantic-ui-react";
+import {
+    Header,
+    Form,
+    Button,
+    Segment,
+    Icon,
+    Message
+} from "semantic-ui-react";
 import { DateTimeInput } from "semantic-ui-calendar-react";
 import ElectionFactory from "../ethereum/ElectionFactory.json";
 import convertTimeStringToDate from "../utils/convertTimeStringToDate";
@@ -83,7 +90,7 @@ class CreateNewElection extends Component {
     }
 
     generateKeys() {
-        const { publicKey, privateKey } = paillier.generateRandomKeys(1024);
+        const { publicKey, privateKey } = paillier.generateRandomKeys(128); // this will generate 256-bits numbers, which is the maximum an Ethereum contract can store as an integer
         this.setState({
             publicKey,
             privateKey,
@@ -144,7 +151,8 @@ class CreateNewElection extends Component {
                     this.state.title,
                     this.state.description,
                     convertTimeStringToDate(this.state.startTime),
-                    convertTimeStringToDate(this.state.timeLimit)
+                    convertTimeStringToDate(this.state.timeLimit),
+                    JSON.stringify(this.state.publicKey)
                 )
                 .send({ from: this.state.userAddresses[0] });
 
@@ -159,11 +167,13 @@ class CreateNewElection extends Component {
     };
 
     copyKey = () => {
-        navigator.clipboard.writeText(JSON.stringify(this.state.privateKey));
+        navigator.clipboard.writeText(
+            JSON.stringify(this.state.privateKey, null, 2)
+        );
     };
 
     saveKeyToFile = () => {
-        let blob = new Blob([JSON.stringify(this.state.privateKey)], {
+        let blob = new Blob([JSON.stringify(this.state.privateKey, null, 2)], {
             type: "application/json;charset=utf-8"
         });
         FileSaver.saveAs(blob, "privatekey.json");
@@ -192,7 +202,7 @@ class CreateNewElection extends Component {
 
                 <Header as="h1">Create Election</Header>
 
-                <Form onSubmit={this.handleSubmit}>
+                <Form onSubmit={this.handleSubmit} warning>
                     <Header as="h4" attached="top">
                         General Information
                     </Header>
@@ -260,11 +270,33 @@ class CreateNewElection extends Component {
                         Encryption Settings
                     </Header>
                     <Segment attached>
+                        <Message warning>
+                            <Message.Header>
+                                Keep this information secure
+                            </Message.Header>
+                            <Message.List>
+                                <Message.Item>
+                                    Save the below text somewhere secure.
+                                </Message.Item>
+                                <Message.Item>
+                                    If you lose the private key, the election
+                                    results can't be decrypted.
+                                </Message.Item>
+                                <Message.Item>
+                                    Never share the private key with anyone.
+                                    This would expose everyone's vote.
+                                </Message.Item>
+                            </Message.List>
+                        </Message>
                         <Form.TextArea
                             label="Private and Public key"
                             value={
                                 this.state.generatedKeyPair
-                                    ? JSON.stringify(this.state.privateKey)
+                                    ? JSON.stringify(
+                                          this.state.privateKey,
+                                          null,
+                                          2
+                                      )
                                     : "Generating keys..."
                             }
                             readOnly

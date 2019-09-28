@@ -26,7 +26,6 @@ class ViewElection extends Component {
 
     async componentDidMount() {
         await this.loadAllRelevantData();
-        console.log(this.state);
     }
 
     async loadAllRelevantData() {
@@ -65,7 +64,8 @@ class ViewElection extends Component {
                 userHasVoted: await contract.methods
                     .hasVoted(userAddresses[0])
                     .call(),
-                options: await contract.methods.getOptions().call()
+                options: await contract.methods.getOptions().call(),
+                publicKey: await contract.methods.encryptionKey().call()
             };
 
             // Check if user is a regsitered voter
@@ -182,6 +182,7 @@ class ViewElection extends Component {
                             ) : null}
                             <OptionsTableActiveElection
                                 options={this.state.contractDetails.options}
+                                publicKey={this.state.contractDetails.publicKey}
                                 contract={this.state.contract}
                                 userIsRegisteredVoter={
                                     this.state.userIsRegisteredVoter

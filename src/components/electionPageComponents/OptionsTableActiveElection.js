@@ -11,6 +11,8 @@ import {
     Icon
 } from "semantic-ui-react";
 import ProcessingModal from "../ProcessingModal";
+import paillier from "paillier-js";
+import BigInt from "big-integer";
 
 class OptionsTableActiveElection extends Component {
     state = {
@@ -47,10 +49,21 @@ class OptionsTableActiveElection extends Component {
     };
 
     encryptVotes() {
-        let votes = Array(this.props.options.length).fill(0); // TODO: replace with encrypted zero
+        const publicKeyCredentials = JSON.parse(this.props.publicKey);
+        const publicKey = new paillier.PublicKey(
+            BigInt(publicKeyCredentials.n),
+            BigInt(publicKeyCredentials.g)
+        );
+
+        let votes = Array(this.props.options.length);
+        for (let i = 0; i < votes.length; i++) {
+            votes[i] = publicKey.encrypt(0).toString();
+        }
+
         this.state.selected.forEach(option => {
-            votes[option] = 1; // TODO: replace with encrypted one
+            votes[option] = publicKey.encrypt(1).toString();
         });
+
         return votes;
     }
 
