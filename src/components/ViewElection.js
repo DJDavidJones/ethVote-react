@@ -10,6 +10,7 @@ import ElectionFactory from "../ethereum/ElectionFactory.json";
 import Election from "../ethereum/Election.json";
 import addresses from "../ethereum/addresses";
 import getContractStatus from "../utils/getContractStatus";
+import OptionsTableUpcomingElection from "./electionPageComponents/OptionsTableUpcomingElection";
 
 class ViewElection extends Component {
     state = {
@@ -191,7 +192,16 @@ class ViewElection extends Component {
                             />
                         </React.Fragment>
                     ) : (
-                        "upcoming"
+                        <React.Fragment>
+                            {!this.state.userIsRegisteredVoter ? (
+                                <NotRegisteredWarning />
+                            ) : null}
+                            <OptionsTableUpcomingElection
+                                options={this.state.contractDetails.options}
+                                contract={this.state.contract}
+                                userAddresses={this.state.userAddresses}
+                            />
+                        </React.Fragment>
                     )
                 ) : null}
             </React.Fragment>

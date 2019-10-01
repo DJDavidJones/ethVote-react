@@ -136,6 +136,8 @@ class CreateNewElection extends Component {
                 this.state.timeLimit
             ) {
                 this.setState({ inputsValid: true });
+            } else {
+                this.setState({ inputsValid: false });
             }
         });
     };
@@ -327,7 +329,7 @@ class CreateNewElection extends Component {
                         <Button
                             type="submit"
                             fluid
-                            loading={this.state.processingTransaction}
+                            loading={this.state.modalState === "processing"}
                             color="green"
                             disabled={!this.state.inputsValid}
                         >
