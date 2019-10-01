@@ -157,9 +157,13 @@ class OptionsTableActiveElection extends Component {
                                 <Table.HeaderCell>
                                     <Button
                                         animated="fade"
-                                        loading={this.state.processingVote}
+                                        loading={
+                                            this.state.modalState ===
+                                            "processing"
+                                        }
                                         onClick={this.vote}
                                         color="green"
+                                        fluid
                                         disabled={
                                             !(
                                                 this.state.selected.length >
