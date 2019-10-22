@@ -64,7 +64,7 @@ class OptionsTableActiveElection extends Component {
             votes[option] = publicKey.encrypt(1).toString();
         });
 
-        return votes;
+        return JSON.stringify(votes);
     }
 
     handleModalClose = () => {
