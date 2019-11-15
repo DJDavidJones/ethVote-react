@@ -2,13 +2,13 @@ import React, { Component } from "react";
 import {
     Button,
     Table,
-    Checkbox,
+    Form,
     Loader,
     Segment,
     Dimmer,
     Image,
-    Message,
-    Icon
+    Icon,
+    Header
 } from "semantic-ui-react";
 import ProcessingModal from "../ProcessingModal";
 import paillier from "paillier-js";
@@ -19,16 +19,46 @@ class OptionsTablePastElection extends Component {
         modalOpen: false,
         modalState: "",
         errorMessage: "",
-        publishedResults: []
+        electionManager: "",
+        publishedResults: [],
+        privateKey: "",
+        privateKeyChangedOnce: false,
+        inputsValid: false
     };
 
     async componentDidMount() {
         this.setState({
             publishedResults: await this.props.contract.methods
                 .getResults()
+                .call(),
+            electionManager: await this.props.contract.methods
+                .electionManager()
                 .call()
         });
     }
+
+    handleChange = (e, { name, value }) => {
+        switch (name) {
+            case "privateKey":
+                this.setState({ privateKeyChangedOnce: true });
+                break;
+            default:
+                break;
+        }
+
+        this.setState({ [name]: value }, function() {
+            // callback because state isn't updated immediately
+            if (this.state.privateKey) {
+                this.setState({ inputsValid: true });
+            } else {
+                this.setState({ inputsValid: false });
+            }
+        });
+    };
+
+    handleSubmit = async event => {
+        event.preventDefault();
+    };
 
     handleModalClose = () => {
         this.setState({ modalOpen: false });
@@ -46,6 +76,37 @@ class OptionsTablePastElection extends Component {
                     errorMessage="We encountered an error. Please try again."
                     successMessage="The results have been decrypted and published."
                 />
+
+                {this.state.electionManager === this.props.userAddresses[0] &&
+                this.state.publishedResults.length === 0 ? (
+                    <Form onSubmit={this.handleSubmit} warning>
+                        <Header as="h4" attached="top">
+                            Decrypt and Publish
+                        </Header>
+                        <Segment attached>
+                            <Form.TextArea
+                                label="Private key"
+                                name="privateKey"
+                                value={this.state.privateKey}
+                                onChange={this.handleChange}
+                                error={
+                                    !this.state.privateKey &&
+                                    this.state.privateKeyChangedOnce
+                                }
+                                style={{ minHeight: 100 }}
+                            />
+                            <Button
+                                type="submit"
+                                fluid
+                                loading={this.state.modalState === "processing"}
+                                color="green"
+                                disabled={!this.state.inputsValid}
+                            >
+                                Decrypt and Publish
+                            </Button>
+                        </Segment>
+                    </Form>
+                ) : null}
 
                 <Table celled compact unstackable>
                     <Table.Header fullWidth>
