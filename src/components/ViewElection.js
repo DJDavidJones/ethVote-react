@@ -155,7 +155,8 @@ class ViewElection extends Component {
                 />
 
                 {this.state.contractDetails.userHasVoted &&
-                this.state.hasVotedMessageVisible ? (
+                this.state.hasVotedMessageVisible &&
+                contractStatus != "past" ? (
                     <Message
                         icon
                         info
