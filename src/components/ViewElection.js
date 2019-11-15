@@ -11,6 +11,7 @@ import Election from "../ethereum/Election.json";
 import addresses from "../ethereum/addresses";
 import getContractStatus from "../utils/getContractStatus";
 import OptionsTableUpcomingElection from "./electionPageComponents/OptionsTableUpcomingElection";
+import OptionsTablePastElection from "./electionPageComponents/OptionsTablePastElection";
 
 class ViewElection extends Component {
     state = {
@@ -156,7 +157,7 @@ class ViewElection extends Component {
 
                 {this.state.contractDetails.userHasVoted &&
                 this.state.hasVotedMessageVisible &&
-                contractStatus != "past" ? (
+                contractStatus !== "past" ? (
                     <Message
                         icon
                         info
@@ -176,7 +177,13 @@ class ViewElection extends Component {
 
                 {contractStatus !== "error" ? (
                     contractStatus === "past" ? (
-                        "past"
+                        <React.Fragment>
+                            <OptionsTablePastElection
+                                options={this.state.contractDetails.options}
+                                contract={this.state.contract}
+                                userAddresses={this.state.userAddresses}
+                            />
+                        </React.Fragment>
                     ) : contractStatus === "current" ? (
                         <React.Fragment>
                             {!this.state.userIsRegisteredVoter ? (
