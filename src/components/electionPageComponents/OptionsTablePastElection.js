@@ -225,13 +225,19 @@ class OptionsTablePastElection extends Component {
                                 style={{ minHeight: 100 }}
                             />
                             <Button
+                                animated="fade"
                                 type="submit"
                                 fluid
                                 loading={this.state.modalState === "processing"}
                                 color="green"
                                 disabled={!this.state.inputsValid}
                             >
-                                Decrypt and Publish
+                                <Button.Content visible>
+                                    Decrypt and Publish
+                                </Button.Content>
+                                <Button.Content hidden>
+                                    <Icon name="lock open" />
+                                </Button.Content>
                             </Button>
                         </Segment>
                     </Form>
