@@ -90,7 +90,7 @@ class CreateNewElection extends Component {
     }
 
     generateKeys() {
-        const { publicKey, privateKey } = paillier.generateRandomKeys(2048); // this will generate 256-bits numbers, which is the maximum an Ethereum contract can store as an integer
+        const { publicKey, privateKey } = paillier.generateRandomKeys(2048);
         this.setState({
             publicKey,
             privateKey,
