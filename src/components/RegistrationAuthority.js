@@ -3,6 +3,7 @@ import { Redirect } from "react-router-dom";
 import Web3 from "web3";
 import addresses from "../ethereum/addresses";
 import RegistrationAuthorityContract from "../ethereum/RegistrationAuthority.json";
+import ProcessingModal from "./ProcessingModal";
 import {
     Segment,
     Dimmer,
@@ -21,7 +22,10 @@ class RegistrationAuthority extends Component {
         showLoader: true,
         userIsRegAuthority: false,
         wrongNetwork: false,
-        voters: []
+        voters: [],
+        modalOpen: false,
+        modalState: "",
+        errorMessage: ""
     };
 
     async componentDidMount() {
@@ -75,7 +79,8 @@ class RegistrationAuthority extends Component {
                     web3,
                     regAuthority,
                     userIsRegAuthority,
-                    voters: voterDetails
+                    voters: voterDetails,
+                    userAddresses
                 };
             });
         } catch (err) {
@@ -104,18 +109,38 @@ class RegistrationAuthority extends Component {
         window.location.reload();
     };
 
-    handleRemoveClick = i => {
-        console.log(
-            "Clicked " +
-                i +
-                ", corresponding to " +
-                this.state.voters[i].ethAddress
-        );
+    handleRemoveClick = async i => {
+        this.setState({ modalOpen: true, modalState: "processing" });
+
+        try {
+            const address = this.state.voters[i].ethAddress;
+            await this.state.regAuthority.methods
+                .unregisterVoter(address)
+                .send({ from: this.state.userAddresses[0] });
+
+            this.setState({ modalState: "success" });
+        } catch (err) {
+            this.setState({ modalState: "error", modalState: err.message });
+        }
+    };
+
+    handleModalClose = () => {
+        this.setState({ modalOpen: false });
     };
 
     render() {
         return (
             <React.Fragment>
+                <ProcessingModal
+                    modalOpen={this.state.modalOpen}
+                    modalState={this.state.modalState}
+                    handleModalClose={this.handleModalClose}
+                    errorMessageDetailed={this.state.errorMessage}
+                    processingMessage="This usually takes around 15 seconds. Please stay with us."
+                    errorMessage="We encountered an error. Please try again."
+                    successMessage="The user has been deregistered."
+                />
+
                 <Header as="h1">Registration Overview</Header>
 
                 {this.state.redirect ? <Redirect to="/metamask" /> : null}
