@@ -72,7 +72,7 @@ class ViewElection extends Component {
 
             // Check if user is a regsitered voter
             const registered = await regAuthority.methods
-                .voters(userAddresses[0])
+                .isVoter(userAddresses[0])
                 .call();
 
             this.setState({
