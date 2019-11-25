@@ -10,6 +10,7 @@ import ElectionCards from "./electionComponents/ElectionCards";
 import NotRegisteredWarning from "./NotRegisteredWarning";
 import addresses from "../ethereum/addresses";
 import ManagerInfoMessage from "./ManagerInfoMessage.js";
+import RegAuthInfoMessage from "./RegAuthInfoMessage.js";
 
 class Elections extends Component {
     state = {
@@ -17,6 +18,7 @@ class Elections extends Component {
         showLoader: true,
         userIsRegisteredVoter: false,
         userIsManager: false,
+        userIsRegAuthority: false,
         wrongNetwork: false,
         activeItem: "current",
         elections: []
@@ -88,6 +90,12 @@ class Elections extends Component {
                 .call();
             const userIsManager = manager === userAddresses[0];
 
+            // Check if user is registration authority
+            const regAuthorityManager = await regAuthority.methods
+                .manager()
+                .call();
+            const userIsRegAuthority = regAuthorityManager === userAddresses[0];
+
             this.setState(function(prevState, props) {
                 return {
                     showLoader: false,
@@ -95,7 +103,8 @@ class Elections extends Component {
                     regAuthority,
                     electionFactory,
                     userIsRegisteredVoter: registered,
-                    userIsManager
+                    userIsManager,
+                    userIsRegAuthority
                 };
             });
         } catch (err) {
@@ -144,6 +153,11 @@ class Elections extends Component {
             <React.Fragment>
                 {this.state.userIsManager && this.state.showLoader === false ? (
                     <ManagerInfoMessage />
+                ) : null}
+
+                {this.state.userIsRegAuthority &&
+                this.state.showLoader === false ? (
+                    <RegAuthInfoMessage />
                 ) : null}
 
                 {this.state.userIsRegisteredVoter === false &&

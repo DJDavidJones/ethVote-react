@@ -10,6 +10,7 @@ import Header from "./components/Header";
 import { Container } from "semantic-ui-react";
 import ViewElection from "./components/ViewElection";
 import CreateNewElection from "./components/CreateNewElection";
+import RegistrationAuthority from "./components/RegistrationAuthority";
 
 class App extends Component {
     render() {
@@ -30,6 +31,10 @@ class App extends Component {
                             component={MetamaskWrongNetwork}
                         />
                         <Route path="/register" component={Register} />
+                        <Route
+                            path="/registrationauthority"
+                            component={RegistrationAuthority}
+                        />
                         <Route path="/about" component={About} />
                         <Route
                             path="/election/:address"
