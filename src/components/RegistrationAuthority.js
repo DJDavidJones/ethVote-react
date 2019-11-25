@@ -3,7 +3,17 @@ import { Redirect } from "react-router-dom";
 import Web3 from "web3";
 import addresses from "../ethereum/addresses";
 import RegistrationAuthorityContract from "../ethereum/RegistrationAuthority.json";
-import { Segment, Dimmer, Loader, Image, Table } from "semantic-ui-react";
+import {
+    Segment,
+    Dimmer,
+    Loader,
+    Image,
+    Table,
+    Header,
+    Button,
+    Input,
+    Icon
+} from "semantic-ui-react";
 
 class RegistrationAuthority extends Component {
     state = {
@@ -94,15 +104,28 @@ class RegistrationAuthority extends Component {
         window.location.reload();
     };
 
+    handleRemoveClick = i => {
+        console.log(
+            "Clicked " +
+                i +
+                ", corresponding to " +
+                this.state.voters[i].ethAddress
+        );
+    };
+
     render() {
         return (
             <React.Fragment>
-                <h1>Registration Authority</h1>
+                <Header as="h1">Registration Overview</Header>
 
                 {this.state.redirect ? <Redirect to="/metamask" /> : null}
 
                 {this.state.wrongNetwork ? (
                     <Redirect to="/wrongnetwork" />
+                ) : null}
+
+                {!this.state.showLoader && !this.state.userIsRegAuthority ? (
+                    <Redirect to="/" />
                 ) : null}
 
                 {this.state.showLoader ? (
@@ -123,10 +146,43 @@ class RegistrationAuthority extends Component {
                                 <Table.HeaderCell>
                                     Ethereum Address
                                 </Table.HeaderCell>
+                                <Table.HeaderCell textAlign="center">
+                                    Control
+                                </Table.HeaderCell>
                             </Table.Row>
                         </Table.Header>
 
                         <Table.Body>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <Input fluid placeholder="ID Number" />
+                                </Table.Cell>
+                                <Table.Cell>
+                                    <Input fluid placeholder="Name" />
+                                </Table.Cell>
+                                <Table.Cell>
+                                    <Input fluid placeholder="Address" />
+                                </Table.Cell>
+                                <Table.Cell>
+                                    <Input fluid placeholder="Birthdate" />
+                                </Table.Cell>
+                                <Table.Cell>
+                                    <Input
+                                        fluid
+                                        placeholder="Ethereum Address"
+                                    />
+                                </Table.Cell>
+                                <Table.Cell textAlign="center">
+                                    <Button fluid positive animated="fade">
+                                        <Button.Content visible>
+                                            Register
+                                        </Button.Content>
+                                        <Button.Content hidden>
+                                            <Icon name="add user" />
+                                        </Button.Content>
+                                    </Button>
+                                </Table.Cell>
+                            </Table.Row>
                             {this.state.voters.length !== 0 ? (
                                 this.state.voters.map((voter, i) => (
                                     <Table.Row key={i}>
@@ -142,6 +198,23 @@ class RegistrationAuthority extends Component {
                                         </Table.Cell>
                                         <Table.Cell>
                                             {voter.ethAddress}
+                                        </Table.Cell>
+                                        <Table.Cell textAlign="center">
+                                            <Button
+                                                fluid
+                                                negative
+                                                animated="fade"
+                                                onClick={() =>
+                                                    this.handleRemoveClick(i)
+                                                }
+                                            >
+                                                <Button.Content visible>
+                                                    Deregister
+                                                </Button.Content>
+                                                <Button.Content hidden>
+                                                    <Icon name="remove user" />
+                                                </Button.Content>
+                                            </Button>
                                         </Table.Cell>
                                     </Table.Row>
                                 ))
