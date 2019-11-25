@@ -1,4 +1,4 @@
 module.exports = {
-    registrationAuthority: "0xCdE735619A3006798F6A8f4a609C4eE8b35Dc735",
-    electionFactory: "0xdfDAb084fd245b3475952f58B9A59E4Ec405e535"
+    registrationAuthority: "0x912a0E44308A03f66Fc5840cba4Ecb81eb7bB82B",
+    electionFactory: "0xD523bde2D06cA779f3438C5C6e590Bc0950931ad"
 };
