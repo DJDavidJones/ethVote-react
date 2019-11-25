@@ -25,7 +25,14 @@ class RegistrationAuthority extends Component {
         voters: [],
         modalOpen: false,
         modalState: "",
-        errorMessage: ""
+        errorMessage: "",
+        idNumber: "",
+        name: "",
+        address: "",
+        birthdate: "",
+        ethAddress: "",
+        ethAddressChangedOnce: false,
+        inputsValid: false
     };
 
     async componentDidMount() {
@@ -109,6 +116,20 @@ class RegistrationAuthority extends Component {
         window.location.reload();
     };
 
+    handleChange = (e, { name, value }) => {
+        if (name === "ethAddress") {
+            this.setState({ ethAddressChangedOnce: true });
+        }
+
+        this.setState({ [name]: value }, function() {
+            if (this.state.ethAddress) {
+                this.setState({ inputsValid: true });
+            } else {
+                this.setState({ inputsValid: false });
+            }
+        });
+    };
+
     handleRemoveClick = async i => {
         this.setState({ modalOpen: true, modalState: "processing" });
 
@@ -120,7 +141,27 @@ class RegistrationAuthority extends Component {
 
             this.setState({ modalState: "success" });
         } catch (err) {
-            this.setState({ modalState: "error", modalState: err.message });
+            this.setState({ modalState: "error", errorMessage: err.message });
+        }
+    };
+
+    handleRegisterVoter = async e => {
+        this.setState({ modalOpen: true, modalState: "processing" });
+
+        try {
+            await this.state.regAuthority.methods
+                .registerOrUpdateVoter(
+                    this.state.ethAddress,
+                    this.state.name,
+                    this.state.address,
+                    this.state.birthdate,
+                    this.state.idNumber
+                )
+                .send({ from: this.state.userAddresses[0] });
+
+            this.setState({ modalState: "success" });
+        } catch (err) {
+            this.setState({ modalState: "error", errorMessage: err.message });
         }
     };
 
@@ -180,25 +221,62 @@ class RegistrationAuthority extends Component {
                         <Table.Body>
                             <Table.Row>
                                 <Table.Cell>
-                                    <Input fluid placeholder="ID Number" />
+                                    <Input
+                                        fluid
+                                        placeholder="ID Number"
+                                        name="idNumber"
+                                        value={this.state.idNumber}
+                                        onChange={this.handleChange}
+                                    />
                                 </Table.Cell>
                                 <Table.Cell>
-                                    <Input fluid placeholder="Name" />
+                                    <Input
+                                        fluid
+                                        placeholder="Name"
+                                        name="name"
+                                        value={this.state.name}
+                                        onChange={this.handleChange}
+                                    />
                                 </Table.Cell>
                                 <Table.Cell>
-                                    <Input fluid placeholder="Address" />
+                                    <Input
+                                        fluid
+                                        placeholder="Address"
+                                        name="address"
+                                        value={this.state.address}
+                                        onChange={this.handleChange}
+                                    />
                                 </Table.Cell>
                                 <Table.Cell>
-                                    <Input fluid placeholder="Birthdate" />
+                                    <Input
+                                        fluid
+                                        placeholder="Birthdate"
+                                        name="birthdate"
+                                        value={this.state.birthdate}
+                                        onChange={this.handleChange}
+                                    />
                                 </Table.Cell>
                                 <Table.Cell>
                                     <Input
                                         fluid
                                         placeholder="Ethereum Address"
+                                        name="ethAddress"
+                                        value={this.state.ethAddress}
+                                        onChange={this.handleChange}
+                                        error={
+                                            !this.state.inputsValid &&
+                                            this.state.ethAddressChangedOnce
+                                        }
                                     />
                                 </Table.Cell>
                                 <Table.Cell textAlign="center">
-                                    <Button fluid positive animated="fade">
+                                    <Button
+                                        fluid
+                                        positive
+                                        animated="fade"
+                                        disabled={!this.state.inputsValid}
+                                        onClick={this.handleRegisterVoter}
+                                    >
                                         <Button.Content visible>
                                             Register
                                         </Button.Content>
