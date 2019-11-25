@@ -31,13 +31,13 @@ class ViewElection extends Component {
     }
 
     async loadAllRelevantData() {
-        let web3, regAuthority, electionFactory, contract;
+        let web3, regAuthority, /*electionFactory,*/ contract;
         try {
             // Get Web3 and contracts
             await window.web3.currentProvider.enable();
             web3 = new Web3(window.web3.currentProvider);
             regAuthority = this.getRegistrationAuthority(web3);
-            electionFactory = this.getElectionFactory(web3);
+            //electionFactory = this.getElectionFactory(web3);
 
             window.web3.currentProvider.on(
                 "accountsChanged",
