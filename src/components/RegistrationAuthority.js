@@ -32,7 +32,8 @@ class RegistrationAuthority extends Component {
         birthdate: "",
         ethAddress: "",
         ethAddressChangedOnce: false,
-        inputsValid: false
+        inputsValid: false,
+        successMessage: ""
     };
 
     async componentDidMount() {
@@ -131,7 +132,7 @@ class RegistrationAuthority extends Component {
     };
 
     handleRemoveClick = async i => {
-        this.setState({ modalOpen: true, modalState: "processing" });
+        this.setState({ successMessage: "The user has been deregistered.", modalOpen: true, modalState: "processing" });
 
         try {
             const address = this.state.voters[i].ethAddress;
@@ -146,7 +147,7 @@ class RegistrationAuthority extends Component {
     };
 
     handleRegisterVoter = async e => {
-        this.setState({ modalOpen: true, modalState: "processing" });
+        this.setState({ successMessage: "The user has been registered.", modalOpen: true, modalState: "processing" });
 
         try {
             await this.state.regAuthority.methods
@@ -179,7 +180,7 @@ class RegistrationAuthority extends Component {
                     errorMessageDetailed={this.state.errorMessage}
                     processingMessage="This usually takes around 15 seconds. Please stay with us."
                     errorMessage="We encountered an error. Please try again."
-                    successMessage="The user has been deregistered."
+                    successMessage={this.state.successMessage}
                 />
 
                 <Header as="h1">Registration Overview</Header>
