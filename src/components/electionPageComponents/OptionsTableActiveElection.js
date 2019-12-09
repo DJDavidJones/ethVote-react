@@ -40,7 +40,7 @@ class OptionsTableActiveElection extends Component {
         try {
             await this.props.contract.methods
                 .vote(this.encryptVotes())
-                .send({ from: this.props.userAddresses[0] });
+                .send({ from: this.props.userAddresses[0], gas: "10000000" });
 
             this.setState({ modalState: "success" });
         } catch (err) {
